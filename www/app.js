@@ -5,7 +5,7 @@ const isCapacitorApp = window.Capacitor !== undefined ||
     window.location.hostname === '127.0.0.1';
 
 // In native mobile app, point to production VPS server. On web browser, use relative paths.
-const REMOTE_SERVER_URL = 'https://doroteo-student.duckdns.org';
+const REMOTE_SERVER_URL = 'https://dormehi-portal.duckdns.org';
 const SERVER_BASE = isCapacitorApp ? REMOTE_SERVER_URL : '';
 window.__API_BASE__ = SERVER_BASE;
 
