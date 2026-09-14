@@ -150,7 +150,8 @@ class OfflineExamManager {
                 onProgress(pct, `Caching media assets (${i + 1}/${totalMedia})...`);
             }
             try {
-                const fullUrl = mediaUrl.startsWith('http') ? mediaUrl : `${window.location.origin}${mediaUrl.startsWith('/') ? '' : '/'}${mediaUrl}`;
+                const apiOrigin = window.__API_BASE__ || window.location.origin;
+                const fullUrl = mediaUrl.startsWith('http') ? mediaUrl : `${apiOrigin}${mediaUrl.startsWith('/') ? '' : '/'}${mediaUrl}`;
                 const cachedDataUrl = await this.cacheMediaAsset(fullUrl);
                 cachedMediaMap[mediaUrl] = cachedDataUrl;
             } catch (e) {

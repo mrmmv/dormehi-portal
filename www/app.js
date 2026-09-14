@@ -1,5 +1,27 @@
-const API_URL = '/api/student';
-const LIS_SERVER_URL = ''; // Use relative path since portal serves uploads directly
+// Detect if running inside native mobile container (Capacitor/Cordova)
+const isCapacitorApp = window.Capacitor !== undefined ||
+    window.location.protocol === 'capacitor:' ||
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1';
+
+// In native mobile app, point to production VPS server. On web browser, use relative paths.
+const REMOTE_SERVER_URL = 'https://doroteo-student.duckdns.org';
+const SERVER_BASE = isCapacitorApp ? REMOTE_SERVER_URL : '';
+window.__API_BASE__ = SERVER_BASE;
+
+// Automatically route relative fetch calls to remote server when running in mobile app
+if (isCapacitorApp && typeof window.fetch === 'function') {
+    const _nativeFetch = window.fetch;
+    window.fetch = function(resource, init) {
+        if (typeof resource === 'string' && resource.startsWith('/')) {
+            resource = REMOTE_SERVER_URL + resource;
+        }
+        return _nativeFetch.call(this, resource, init);
+    };
+}
+
+const API_URL = `${SERVER_BASE}/api/student`;
+const LIS_SERVER_URL = SERVER_BASE; // Use server URL in mobile app so uploads resolve correctly
 let authToken = localStorage.getItem('studentToken');
 let currentStudent = null;
 let profileData = null;
