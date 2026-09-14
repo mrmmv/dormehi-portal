@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Offline-First Examination & Learner Portal Mobile App for Android and iOS",
   "scripts": {
-    "build": "npx @capacitor/assets generate --android && node sync-portal-assets.js",
+    "build": "node sync-portal-assets.js",
     "generate-icons": "npx @capacitor/assets generate --android",
     "sync-assets": "node sync-portal-assets.js",
     "cap:sync": "node sync-portal-assets.js && cap sync",
