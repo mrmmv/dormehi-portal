@@ -9,6 +9,17 @@ const path = require('path');
 const srcDir = path.resolve(__dirname, '../portal/public');
 const destDir = path.resolve(__dirname, 'www');
 
+// In CI/Cloud build runners (like Appflow), www is already committed to the repo
+if (!fs.existsSync(srcDir)) {
+    if (fs.existsSync(destDir)) {
+        console.log('✅ CI environment: Using pre-built www directory.');
+        process.exit(0);
+    } else {
+        console.error('Error: Neither portal/public nor www directory found.');
+        process.exit(1);
+    }
+}
+
 function copyRecursive(src, dest) {
     if (!fs.existsSync(dest)) {
         fs.mkdirSync(dest, { recursive: true });
