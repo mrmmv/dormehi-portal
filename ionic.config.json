@@ -1,0 +1,7 @@
+{
+  "name": "learner-portal-mobile",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "custom"
+}

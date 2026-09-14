@@ -1,0 +1,20 @@
+{
+  "appId": "ph.deped.dsmsmnhs.learnerportal",
+  "appName": "Learner Portal",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "server": {
+    "cleartext": true,
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "StatusBar": {
+      "overlaysWebView": false,
+      "style": "DARK",
+      "backgroundColor": "#0f172a"
+    },
+    "ScreenOrientation": {
+      "orientation": "portrait"
+    }
+  }
+}

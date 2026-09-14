@@ -1,0 +1,26 @@
+{
+  "name": "learner-portal-mobile",
+  "version": "1.0.0",
+  "description": "Offline-First Examination & Learner Portal Mobile App for Android and iOS",
+  "scripts": {
+    "generate-icons": "npx @capacitor/assets generate",
+    "sync-assets": "node sync-portal-assets.js",
+    "cap:sync": "node sync-portal-assets.js && cap sync",
+    "cap:build-android": "node sync-portal-assets.js && cap sync android",
+    "cap:open-android": "cap open android",
+    "cap:open-ios": "cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/ios": "^6.0.0",
+    "@capacitor/network": "^6.0.0",
+    "@capacitor/screen-orientation": "^6.0.0",
+    "@capacitor/status-bar": "^6.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/assets": "^3.0.5"
+  }
+}
