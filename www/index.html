@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Learner Portal - DSMSMNHS</title>
+    <!-- MathJax for rendering Mathematical Expressions -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] }
+        };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/3.32.1/minified.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link rel="stylesheet" href="fontawesome-free-6.4.0-web/css/all.min.css">
+    <link rel="stylesheet" href="styles.css?v=5">
+    <link rel="stylesheet" href="election_styles.css?v=5">
+    <link rel="stylesheet" href="lms-student.css?v=7-remedial-layout-fix"> <!-- New LMS Styles -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="apple-touch-icon" href="logo.png">
+    <style>
+        /* Extra styles for exam */
+        .exam-timer {
+            position: sticky;
+            top: 20px;
+            background: var(--danger);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .question-card {
+            margin-bottom: 20px;
+            padding: 25px;
+            border-radius: 15px;
+            transition: all 0.3s;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-item:hover {
+            background: #f1f5f9;
+            border-color: var(--primary);
+        }
+
+        .option-item.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .option-item input {
+            display: none;
+        }
+
+        .cheat-warning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            color: white;
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 40px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="cheatWarning" class="cheat-warning">
+        <i class="fas fa-exclamation-triangle" style="font-size: 5rem; color: var(--danger); margin-bottom: 20px;"></i>
+        <h1>SECURITY ALERT: WINDOW BLUR DETECTED</h1>
+        <p style="font-size: 1.2rem; max-width: 600px; margin: 20px 0;">
+            Leaving the exam window is strictly prohibited. Your activity has been logged.
+            You must wait for the timer before you can return to your exam.
+        </p>
+        <h2 id="cheatTimer" style="font-size: 3rem; margin: 20px 0; color: var(--warning);">30</h2>
+        <p>Next violation will result in <strong>IMMEDIATE LOCKOUT</strong>.</p>
+    </div>
+
+    <!-- Teacher In-Person Override Unlock Modal (For Offline Anti-Cheat Lockout) -->
+    <div id="teacherOverrideModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 30000; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: #1e293b; border: 2px solid #ef4444; border-radius: 16px; padding: 30px; max-width: 440px; width: 100%; text-align: center; color: white; box-shadow: 0 10px 40px rgba(239,68,68,0.4);">
+            <i class="fas fa-user-shield" style="font-size: 3.8rem; color: #ef4444; margin-bottom: 15px;"></i>
+            <h2 style="margin-bottom: 10px; color: #f87171; font-size: 1.5rem;">EXAM LOCKED (SECURITY ALERT)</h2>
+            <p style="font-size: 0.92rem; color: #cbd5e1; margin-bottom: 20px; line-height: 1.5;">
+                This examination was locked due to security policy violations. To unlock and resume taking your test in the classroom, please have your <strong>Subject Teacher / Proctor</strong> enter the Exam Unlock PIN.
+            </p>
+            <div style="margin-bottom: 20px;">
+                <input type="password" id="teacherOverridePinInput" placeholder="Teacher 4-Digit PIN" maxlength="8" style="width: 100%; padding: 14px; font-size: 1.6rem; text-align: center; letter-spacing: 8px; border-radius: 8px; border: 2px solid #64748b; background: #0f172a; color: white; outline: none;">
+                <div id="teacherPinError" style="color: #f87171; margin-top: 8px; font-size: 0.9rem; display: none;">❌ Incorrect Teacher PIN for this examination.</div>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button type="button" onclick="submitTeacherOverridePin()" style="flex: 1; padding: 14px; background: #ef4444; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer;">
+                    <i class="fas fa-unlock-alt"></i> Verify &amp; Unlock Exam
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="screen active">
+        <div class="login-container">
+            <div class="login-box glass">
+                <div class="login-header">
+                    <img src="logo.png" alt="School Logo" class="portal-logo" id="schoolLogo">
+                    <h1>Learner Portal</h1>
+                    <p>Welcome back, Student!</p>
+                </div>
+                <form id="loginForm">
+                    <div class="input-group">
+                        <label>Learner Reference Number (LRN)</label>
+                        <input type="text" id="lrn" placeholder="12-digit LRN" required maxlength="12">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <div class="input-group">
+                        <label>Password / Birthdate</label>
+                        <input type="password" id="birthdate" placeholder="Password or MMDDYYYY" required>
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        <span>Sign In</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <div id="loginError" class="error-msg"></div>
+                </form>
+                <div class="login-footer">
+                    <p>Powered by <strong>MVE Technologies</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Portal App -->
+    <div id="portalApp" class="screen">
+        <!-- Global Offline & Sync Status Notification Bar -->
+        <div id="offlineSyncBar" style="display: none; width: 100%; padding: 10px 20px; color: white; justify-content: space-between; align-items: center; font-size: 0.95rem; z-index: 9999; box-shadow: 0 2px 8px rgba(0,0,0,0.15); transition: all 0.3s ease;">
+            <div id="offlineSyncStatusText" style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-wifi"></i> <span>Connected</span>
+            </div>
+            <button id="offlineSyncNowBtn" onclick="offlineExamManager.syncPendingExams()" style="background: white; color: #0284c7; border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; display: none;">
+                <i class="fas fa-sync-alt"></i> Sync Now
+            </button>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <aside class="sidebar glass" id="sidebar">
+            <div class="sidebar-header">
+                <div class="student-avatar">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="student-info">
+                    <h3 id="studentName">Student Name</h3>
+                    <p id="studentLrn">LRN: 123456789012</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" onclick="showSection('dashboard')">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <style>
+                    .ios-badge {
+                        position: absolute;
+                        top: 5px;
+                        right: 15px;
+                        background-color: #ff3b30;
+                        color: white;
+                        font-size: 0.75rem;
+                        font-weight: bold;
+                        border-radius: 12px;
+                        padding: 2px 6px;
+                        min-width: 20px;
+                        text-align: center;
+                        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+                        z-index: 10;
+                    }
+                </style>
+                <a href="#" class="nav-item" onclick="showSection('grades')">
+                    <i class="fas fa-award"></i>
+                    <span>My Grades</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('learnerRecord'); loadStudentLearnerRecord();">
+                    <i class="fas fa-id-card"></i>
+                    <span>Learner Record</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('attendance')">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Attendance</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('schedule'); loadStudentSchedule();">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Schedule</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('lms'); loadStudentLms();">
+                    <i class="fas fa-laptop-house"></i>
+                    <span>LMS</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('communication'); loadStudentCommunication();"
+                    style="position: relative;">
+                    <i class="fas fa-comments"></i>
+                    <span>Communication</span>
+                    <span id="commBadge" class="ios-badge" style="display: none;"></span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('exams')">
+                    <i class="fas fa-edit"></i>
+                    <span>Online Exam</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('examResults')">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Exam Results</span>
+                </a>
+                <a href="#" class="nav-item" id="enrollmentMenu" style="display: none;"
+                    onclick="showSection('enrollment')">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Enrollment</span>
+                </a>
+                <a href="#" class="nav-item" id="electionMenu" style="display: none;"
+                    onclick="showSection('election'); loadElectionData();">
+                    <i class="fas fa-vote-yea"></i>
+                    <span>SSLG Election</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('ptaAccountability'); loadPTAData();">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <span>PTA Accountability</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('bmi'); loadBMIData();">
+                    <i class="fas fa-weight"></i>
+                    <span>Nutritional Status</span>
+                </a>
+                <a href="#" class="nav-item" id="aralTutorMenu" style="display: none;" onclick="showSection('aralTutor'); loadAralTutor();">
+                    <i class="fas fa-brain" style="color: #8b5cf6;"></i>
+                    <span style="font-weight: 700; color: #8b5cf6;">Aral Tutor AI</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('profile')">
+                    <i class="fas fa-user-circle"></i>
+                    <span>My Profile</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-nav glass">
+                <div class="section-title">
+                    <h2 id="currentSectionTitle">Dashboard</h2>
+                </div>
+                <div class="academic-info">
+                    <span class="badge" id="currentSection">---</span>
+                    <span class="badge" id="currentSY">---</span>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <!-- Dashboard Section -->
+                <section id="dashboardSection" class="content-section active">
+                    <div class="welcome-banner glass">
+                        <div class="banner-text">
+                            <h1>Welcome back, <span id="welcomeName">Student</span>! 👋</h1>
+                            <p>Here's a quick look at your academic standing.</p>
+                        </div>
+                        <div class="banner-img">
+                            <i class="fas fa-laptop-code"></i>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card glass">
+                            <div class="icon-box blue">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <div class="details">
+                                <h3>GWA</h3>
+                                <p id="gwaValue">Pending</p>
+                            </div>
+                        </div>
+                        <div class="stat-card glass">
+                            <div class="icon-box green">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="details">
+                                <h3>Presence</h3>
+                                <p id="attendanceRate">0%</p>
+                            </div>
+                        </div>
+                        <div class="stat-card glass">
+                            <div class="icon-box orange">
+                                <i class="fas fa-medal"></i>
+                            </div>
+                            <div class="details">
+                                <h3>Rank</h3>
+                                <p>--</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="recent-grades glass">
+                            <div class="card-header">
+                                <h3>Recent Grades</h3>
+                                <button onclick="showSection('grades')">View All</button>
+                            </div>
+                            <div class="table-container">
+                                <table id="recentGradesTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th>1st Term</th>
+                                            <th>2nd Term</th>
+                                            <th>3rd Term</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="4" class="loading">Loading grades...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="recent-attendance glass">
+                            <div class="card-header">
+                                <h3>Recent Scans</h3>
+                                <button onclick="showSection('attendance')">View History</button>
+                            </div>
+                            <div class="timeline" id="recentAttendance">
+                                <div class="loading">Loading attendance...</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Grades Section -->
+                <section id="gradesSection" class="content-section">
+                    <div class="grades-container glass">
+                        <div class="card-header">
+                            <h3>Academic Performance</h3>
+                        </div>
+                        <div class="table-container">
+                            <table class="report-card-table" id="fullGradesTable">
+                                <thead>
+                                    <tr>
+                                        <th>Subject</th>
+                                        <th>1st Term</th>
+                                        <th>2nd Term</th>
+                                        <th>3rd Term</th>
+                                        <th>Final Rating</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <div id="gradesSignatureSection" class="signature-section"
+                            style="display: none; background: #f8fafc; padding: 25px; border-radius: 15px; border: 1px solid #e2e8f0; margin-top: 20px;">
+                            <h3>Parent / Guardian Signature & Feedback for Term <span id="signatureTermNumber"></span></h3>
+
+                            <!-- Adviser's Constructive Comment & Feedback Card -->
+                            <div id="adviserRemarksCard" style="background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%); border-left: 5px solid #2563eb; padding: 18px 20px; border-radius: 12px; margin: 15px 0 20px 0; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08); border-top: 1px solid #e0f2fe; border-right: 1px solid #e0f2fe; border-bottom: 1px solid #e0f2fe;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                    <i class="fas fa-comment-dots" style="font-size: 1.25rem; color: #2563eb;"></i>
+                                    <h4 style="margin: 0; color: #1e3a8a; font-weight: 700; font-size: 1rem;">Adviser's Constructive Feedback & Remarks</h4>
+                                </div>
+                                <p id="portalAdviserComment" style="margin: 0; color: #334155; font-size: 0.95rem; line-height: 1.6; font-style: italic; font-weight: 500;">
+                                    Loading remarks...
+                                </p>
+                            </div>
+
+                            <p style="font-weight: 600; color: #475569;">To confirm that you have reviewed these grades and teacher comments, please sign below:</p>
+
+                            <div id="gradesSignatureDisplay" style="display: none; margin-top: 15px;">
+                                <img id="gradesSavedSignature" src="" alt="Parent Signature"
+                                    style="max-width: 300px; border: 1px dashed #ccc; padding: 10px; background: white;">
+                                <p style="color: green; margin-top: 10px;"><i class="fas fa-check-circle"></i> Signed on
+                                    <span id="gradesSignedDate"></span>
+                                </p>
+                            </div>
+
+                            <div id="gradesSignaturePadContainer" style="margin-top: 15px;">
+                                <canvas id="gradesSignCanvas" width="400" height="200"
+                                    style="border: 2px dashed #cbd5e1; background: white; cursor: crosshair; touch-action: none; border-radius: 8px; width: 100%; max-width: 400px;"></canvas>
+                                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                                    <button class="btn-secondary" onclick="clearGradesSignature()">Clear</button>
+                                    <button class="btn-primary" onclick="saveGradesSignature()">Proceed & Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Learner Record Section -->
+                <section id="learnerRecordSection" class="content-section">
+                    <!-- View 1: Subject Folders Grid -->
+                    <div id="lrSubjectsView">
+                        <div class="glass" style="padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                                <div>
+                                    <h3 style="margin: 0; font-size: 1.4rem; color: #1e293b;"><i class="fas fa-folder-open text-primary" style="margin-right: 10px;"></i> Subject Learner Records</h3>
+                                    <p style="margin: 5px 0 0 0; color: #64748b; font-size: 0.95rem;">Select a subject folder below to open your three-term individual learner record.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="studentSubjectFoldersGrid" class="lms-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+                            <div class="loading text-center" style="grid-column: 1/-1;">Loading subject folders...</div>
+                        </div>
+                    </div>
+
+                    <!-- View 2: Individual Learner Record Detail -->
+                    <div id="lrDetailView" style="display: none;">
+                        <!-- Action bar -->
+                        <div class="glass" style="padding: 15px 20px; border-radius: 15px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; background: rgba(255,255,255,0.95);">
+                            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                                <button onclick="backToStudentSubjectFolders()" class="btn-secondary" style="background: #475569; color: white; border: none; border-radius: 8px; padding: 8px 16px; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                                    <i class="fas fa-arrow-left"></i> Back to Folders
+                                </button>
+                                <div style="font-weight: 700; font-size: 1.1rem; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-book" style="color: #3b82f6;"></i> <span id="lrDetailSubjectTitle">Subject Record</span>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <label style="font-size: 0.9rem; font-weight: 600; color: #475569; margin: 0;"><i class="fas fa-calendar-alt text-primary"></i> Select Term:</label>
+                                    <select id="studentLRTermSelect" onchange="switchStudentLRTerm(this.value)" class="form-control" style="background: white; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 14px; font-size: 0.95rem; font-weight: 700; outline: none; cursor: pointer;">
+                                        <option value="1">Term 1</option>
+                                        <option value="2">Term 2</option>
+                                        <option value="3">Term 3</option>
+                                    </select>
+                                </div>
+
+                                <button onclick="printStudentLearnerRecord()" class="btn-success" style="background: #10b981; color: white; border: none; border-radius: 8px; padding: 8px 18px; font-weight: 700; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
+                                    <i class="fas fa-print"></i> Print Preview
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Document Sheet Card -->
+                        <div id="stLRDocumentContainer" style="background: white; border-radius: 16px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; color: #1e293b; max-width: 1000px; margin: 0 auto;">
+                            <!-- Header -->
+                            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #1e3a8a; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                                <div style="width: 70px; text-align: center;">
+                                    <img src="logo.png" alt="Logo" style="max-height: 65px; width: auto;">
+                                </div>
+                                <div style="text-align: center; flex: 1;">
+                                    <h3 style="margin: 0; font-family: 'Georgia', 'Times New Roman', serif; font-weight: 700; font-size: 1.15rem; color: #1e3a8a; text-transform: uppercase;">Doroteo S. Mendoza Sr. Memorial National High School</h3>
+                                    <p style="margin: 2px 0 0 0; font-family: 'Georgia', 'Times New Roman', serif; font-size: 0.85rem; font-weight: 700; color: #475569;">SY <span id="stLRSchoolYear">2026-2027</span></p>
+                                    <h2 style="margin: 10px 0 0 0; font-family: 'Georgia', 'Times New Roman', serif; font-weight: 800; font-size: 1.35rem; color: #1e3a8a; letter-spacing: 1px;">LEARNER'S INDIVIDUAL RECORD</h2>
+                                </div>
+                                <div style="width: 70px; text-align: center;">
+                                    <img src="logo.png" alt="DepEd Logo" style="max-height: 65px; width: auto;">
+                                </div>
+                            </div>
+
+                            <!-- Student Info Fields Bar -->
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: #f8fafc; padding: 16px 20px; border-radius: 12px; border: 1px solid #cbd5e1; margin-bottom: 25px; align-items: center;">
+                                <div>
+                                    <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #64748b; display: block;">Name:</span>
+                                    <strong id="stLRStudentName" style="font-size: 1rem; color: #0f172a;">---</strong>
+                                </div>
+                                <div>
+                                    <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #64748b; display: block;">Subject:</span>
+                                    <strong id="stLRSubjectName" style="font-size: 1rem; color: #0f172a;">---</strong>
+                                </div>
+                                <div>
+                                    <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #64748b; display: block;">Gr. & Sec.:</span>
+                                    <strong id="stLRGrSec" style="font-size: 1rem; color: #0f172a;">---</strong>
+                                </div>
+                                <div>
+                                    <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #64748b; display: block;">Teacher:</span>
+                                    <strong id="stLRTeacherName" style="font-size: 1rem; color: #0f172a;">---</strong>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span id="stLRTermBadge" style="display: inline-block; border: 2px solid #1e3a8a; background: #eff6ff; color: #1e3a8a; padding: 6px 18px; border-radius: 8px; font-weight: 800; font-size: 1.05rem;">Term 1</span>
+                                </div>
+                            </div>
+
+                            <!-- Detailed Assessment Components Tables (P / F Remarks in Every Column) -->
+                            <!-- Written / Oral Work (WW) -->
+                            <div style="border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background: #fff; margin-bottom: 22px; box-shadow: 0 3px 6px -1px rgba(0,0,0,0.05);">
+                                <div style="background: #1e3a8a; padding: 10px 18px; font-weight: 700; color: #ffffff; font-size: 0.95rem; text-align: left; letter-spacing: 0.5px; text-transform: uppercase; display: flex; align-items: center; justify-content: space-between;">
+                                    <span><i class="fas fa-pencil-alt" style="margin-right: 8px;"></i> Written Works / Oral Work (WW)</span>
+                                </div>
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 0.95rem;">
+                                        <thead>
+                                            <tr style="background: #f1f5f9; color: #1e293b; border-bottom: 2px solid #cbd5e1;">
+                                                <th style="padding: 12px 14px; text-align: left; border-right: 1px solid #e2e8f0; width: 22%;">Component</th>
+                                                <th style="padding: 12px 8px; border-right: 1px solid #e2e8f0; width: 11%;">1</th>
+                                                <th style="padding: 12px 8px; border-right: 1px solid #e2e8f0; width: 11%;">2</th>
+                                                <th style="padding: 12px 8px; border-right: 1px solid #e2e8f0; width: 11%;">3</th>
+                                                <th style="padding: 12px 8px; border-right: 1px solid #e2e8f0; width: 11%;">4</th>
+                                                <th style="padding: 12px 8px; border-right: 1px solid #e2e8f0; width: 11%;">5</th>
+                                                <th style="padding: 12px 14px; background-color: #dbeafe; color: #1e3a8a; font-weight: 800; width: 23%;">Total Remarks</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td style="padding: 14px 14px; font-weight: 700; text-align: left; background: #f8fafc; border-right: 1px solid #e2e8f0; color: #0369a1;">
+                                                    <i class="fas fa-check-circle" style="margin-right: 6px;"></i> Remarks
+                                                </td>
+                                                <td id="lr_ww_remark_0" style="padding: 12px 8px; border-right: 1px solid #e2e8f0;">-</td>
+                                                <td id="lr_ww_remark_1" style="padding: 12px 8px; border-right: 1px solid #e2e8f0;">-</td>
+                                                <td id="lr_ww_remark_2" style="padding: 12px 8px; border-right: 1px solid #e2e8f0;">-</td>
+                                                <td id="lr_ww_remark_3" style="padding: 12px 8px; border-right: 1px solid #e2e8f0;">-</td>
+                                                <td id="lr_ww_remark_4" style="padding: 12px 8px; border-right: 1px solid #e2e8f0;">-</td>
+                                                <td id="lr_ww_remark_total" style="padding: 12px 14px; background: #eff6ff;">-</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Product / Performance Tasks (PT) -->
+                            <div style="border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background: #fff; margin-bottom: 22px; box-shadow: 0 3px 6px -1px rgba(0,0,0,0.05);">
+                                <div style="background: #15803d; padding: 10px 18px; font-weight: 700; color: #ffffff; font-size: 0.95rem; text-align: left; letter-spacing: 0.5px; text-transform: uppercase; display: flex; align-items: center; justify-content: space-between;">
+                                    <span><i class="fas fa-tasks" style="margin-right: 8px;"></i> Product / Performance Tasks (PT)</span>
+                                </div>
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 0.95rem;">
+                                        <thead>
+                                            <tr style="background: #f1f5f9; color: #1e293b; border-bottom: 2px solid #cbd5e1;">
+                                                <th style="padding: 12px 14px; text-align: left; border-right: 1px solid #e2e8f0; width: 22%;">Component</th>
+                                                <th style="padding: 12px 8px; border-right: 1px solid #e2e8f0; width: 11%;">1</th>
+                                                <th style="padding: 12px 8px; border-right: 1px solid #e2e8f0; width: 11%;">2</th>
+                                                <th style="padding: 12px 8px; border-right: 1px solid #e2e8f0; width: 11%;">3</th>
+                                                <th style="padding: 12px 8px; border-right: 1px solid #e2e8f0; width: 11%;">4</th>
+                                                <th style="padding: 12px 8px; border-right: 1px solid #e2e8f0; width: 11%;">5</th>
+                                                <th style="padding: 12px 14px; background-color: #dcfce7; color: #15803d; font-weight: 800; width: 23%;">Total Remarks</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td style="padding: 14px 14px; font-weight: 700; text-align: left; background: #f8fafc; border-right: 1px solid #e2e8f0; color: #15803d;">
+                                                    <i class="fas fa-check-circle" style="margin-right: 6px;"></i> Remarks
+                                                </td>
+                                                <td id="lr_pt_remark_0" style="padding: 12px 8px; border-right: 1px solid #e2e8f0;">-</td>
+                                                <td id="lr_pt_remark_1" style="padding: 12px 8px; border-right: 1px solid #e2e8f0;">-</td>
+                                                <td id="lr_pt_remark_2" style="padding: 12px 8px; border-right: 1px solid #e2e8f0;">-</td>
+                                                <td id="lr_pt_remark_3" style="padding: 12px 8px; border-right: 1px solid #e2e8f0;">-</td>
+                                                <td id="lr_pt_remark_4" style="padding: 12px 8px; border-right: 1px solid #e2e8f0;">-</td>
+                                                <td id="lr_pt_remark_total" style="padding: 12px 14px; background: #f0fdf4;">-</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Summative Tests & Examinations (QA) -->
+                            <div style="border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background: #fff; margin-bottom: 25px; box-shadow: 0 3px 6px -1px rgba(0,0,0,0.05);">
+                                <div style="background: #b45309; padding: 10px 18px; font-weight: 700; color: #ffffff; font-size: 0.95rem; text-align: left; letter-spacing: 0.5px; text-transform: uppercase; display: flex; align-items: center; justify-content: space-between;">
+                                    <span><i class="fas fa-file-alt" style="margin-right: 8px;"></i> Summative Tests & Quarterly Exam (QA)</span>
+                                </div>
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 0.95rem;">
+                                        <thead>
+                                            <tr style="background: #f1f5f9; color: #1e293b; border-bottom: 2px solid #cbd5e1;">
+                                                <th style="padding: 12px 14px; text-align: left; border-right: 1px solid #e2e8f0; width: 22%;">Component</th>
+                                                <th style="padding: 12px 10px; border-right: 1px solid #e2e8f0; width: 18%;">Summative 1 (SA1)</th>
+                                                <th style="padding: 12px 10px; border-right: 1px solid #e2e8f0; width: 18%;">Summative 2 (SA2)</th>
+                                                <th style="padding: 12px 10px; border-right: 1px solid #e2e8f0; width: 20%;">Quarterly Exam</th>
+                                                <th style="padding: 12px 14px; background-color: #fef3c7; color: #b45309; font-weight: 800; width: 22%;">Total Remarks</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td style="padding: 14px 14px; font-weight: 700; text-align: left; background: #f8fafc; border-right: 1px solid #e2e8f0; color: #b45309;">
+                                                    <i class="fas fa-check-circle" style="margin-right: 6px;"></i> Remarks
+                                                </td>
+                                                <td id="lr_sa_remark_0" style="padding: 12px 10px; border-right: 1px solid #e2e8f0;">-</td>
+                                                <td id="lr_sa_remark_1" style="padding: 12px 10px; border-right: 1px solid #e2e8f0;">-</td>
+                                                <td id="lr_qa_remark" style="padding: 12px 10px; border-right: 1px solid #e2e8f0;">-</td>
+                                                <td id="lr_exam_remark_total" style="padding: 12px 14px; background: #fffbeb;">-</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+
+                            <!-- Grade Summary Footer Bar (Initial Grade Only) -->
+                            <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 15px; background: #f8fafc; padding: 18px 25px; border-radius: 12px; border: 1px solid #cbd5e1;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <span style="font-weight: 700; font-size: 1rem; color: #334155; text-transform: uppercase; letter-spacing: 0.5px;">INITIAL GRADE:</span>
+                                    <span id="stLRInitialGrade" style="background: #eff6ff; color: #1e3a8a; border: 1.5px solid #93c5fd; padding: 8px 24px; border-radius: 8px; font-weight: 800; font-size: 1.25rem;">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Attendance Section -->
+                <section id="attendanceSection" class="content-section">
+                    <div class="attendance-container glass">
+                        <div class="card-header">
+                            <h3>Attendance Log</h3>
+                        </div>
+                        <div class="table-container">
+                            <table id="fullAttendanceTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Type</th>
+                                        <th>Location</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Schedule Section -->
+                <section id="scheduleSection" class="content-section">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h3 style="margin:0; font-size: 1.5rem; color: #fff;"><i class="fas fa-calendar-alt"
+                                style="color: #3b82f6; margin-right: 8px;"></i> Class Program</h3>
+                        <button class="btn-primary" onclick="printStudentSchedule()"
+                            style="border-radius:20px; padding:8px 20px; background: #3b82f6; border: none; color: white; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.9rem;">
+                            <i class="fas fa-print"></i> Print Schedule
+                        </button>
+                    </div>
+                    <div id="studentScheduleContainer" style="overflow-x: auto; padding-bottom: 20px;">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </section>
+
+                <!-- LMS Section -->
+                <section id="lmsSection" class="content-section">
+                    <div class="glass" style="padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+                        <div class="card-header"
+                            style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">
+                            <h3><i class="fas fa-laptop-house"></i> Learning Management System</h3>
+                            <div class="lms-tabs" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <button id="tab-btn-modular" class="btn-primary"
+                                    onclick="switchStudentLmsTab('modular')">
+                                    <i class="fas fa-tasks"></i> Modular Activities
+                                </button>
+                                <button id="tab-btn-materials" class="btn-secondary"
+                                    onclick="switchStudentLmsTab('materials')">
+                                    <i class="fas fa-book"></i> Learning Materials
+                                </button>
+                                <button id="tab-btn-remedial" class="btn-secondary"
+                                    onclick="switchStudentLmsTab('remedial')">
+                                    <i class="fas fa-user-check"></i> Remediation
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Modular Activities Tab -->
+                        <div id="studentLms-modular">
+                            <div id="studentModularList" class="lms-grid"
+                                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+                                <!-- Populated by JS -->
+                                <p class="text-muted text-center" style="grid-column: 1/-1;">Select a tab to view
+                                    content.</p>
+                            </div>
+                        </div>
+
+                        <!-- Learning Materials Tab -->
+                        <div id="studentLms-materials" style="display: none;">
+                            <div id="studentMaterialsList" class="lms-grid"
+                                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Remediation Tab -->
+                        <div id="studentLms-remedial" style="display: none;">
+                            <!-- Remedial Filters and Breadcrumb Navigation -->
+                            <div class="remedial-filters-bar" style="margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; justify-content: space-between; background: #f8fafc; padding: 12px 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                                <div class="filter-group" style="display: flex; gap: 10px; align-items: center;">
+                                    <label style="color: #334155; font-weight: 600; margin: 0; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+                                        <i class="fas fa-filter text-primary"></i> Term:
+                                    </label>
+                                    <select id="remedialTermFilter" onchange="renderStudentRemedialFolders()" class="form-control" style="background: #ffffff; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 12px; outline: none; width: auto; font-size: 0.9rem;">
+                                        <option value="" style="color: black;">All Terms</option>
+                                        <option value="1" style="color: black;">Term 1</option>
+                                        <option value="2" style="color: black;">Term 2</option>
+                                        <option value="3" style="color: black;">Term 3</option>
+                                    </select>
+                                </div>
+                                <div id="remedialBreadcrumbContainer" style="display: none;">
+                                    <button onclick="remedialBackNavigation()" class="btn btn-sm btn-secondary" style="background: #4b5563; border: none; color: white; border-radius: 8px; padding: 8px 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.85rem; transition: background 0.2s;">
+                                        <i class="fas fa-arrow-left"></i> Back
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="studentRemedialList" class="lms-grid"
+                                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+                                <!-- Populated by JS -->
+                            </div>
+
+                            <!-- Interactive Remedial Room View -->
+                            <div id="studentRemedialRoomView" style="display: none;">
+                                <!-- Left side: Activities and Quiz -->
+                                <div class="glass"
+                                    style="padding: 20px; border-radius: 15px; max-height: 80vh; overflow-y: auto;">
+                                    <button class="btn btn-sm btn-secondary" onclick="exitRemedialRoom()"
+                                        style="margin-bottom: 15px; background: #e2e8f0; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer;">
+                                        <i class="fas fa-arrow-left"></i> Back to Remediation List
+                                    </button>
+                                    <h2 id="remedialCompetencyTitle"
+                                        style="font-size: 1.3rem; font-weight: bold; margin-bottom: 5px; color: #1e3a8a;">
+                                    </h2>
+                                    <p id="remedialSubjectTitle"
+                                        style="color: #64748b; font-size: 0.9rem; margin-bottom: 20px;"></p>
+
+                                    <!-- Activities Section -->
+                                    <div id="remedialActivitiesSection">
+                                        <h3
+                                            style="font-size: 1.1rem; border-bottom: 2px solid #3b82f6; padding-bottom: 5px; margin-bottom: 15px; color: #1e293b;">
+                                            <i class="fas fa-tasks text-primary"></i> Remedial Activities (Complete all
+                                            3)
+                                        </h3>
+                                        <div id="activitiesAccordion"
+                                            style="display: flex; flex-direction: column; gap: 15px;">
+                                            <!-- Populated by JS -->
+                                        </div>
+                                    </div>
+
+                                    <!-- Quiz Section (Visible after activities are completed/submitted) -->
+                                    <div id="remedialQuizSection" style="margin-top: 30px; display: none;">
+                                        <h3
+                                            style="font-size: 1.1rem; border-bottom: 2px solid #10b981; padding-bottom: 5px; margin-bottom: 15px; color: #1e293b;">
+                                            <i class="fas fa-graduation-cap text-success"></i> Competency Quiz (10
+                                            Items)
+                                        </h3>
+                                        <form id="remedialQuizForm">
+                                            <div id="quizQuestionsContainer"
+                                                style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 20px;">
+                                                <!-- Populated by JS -->
+                                            </div>
+                                            <button type="button" class="btn btn-success" onclick="submitRemedialQuiz()"
+                                                style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                                                <i class="fas fa-paper-plane"></i> Submit Quiz Answers
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    <!-- Completed / Evaluated Screen -->
+                                    <div id="remedialFeedbackSection"
+                                        style="margin-top: 30px; display: none; padding: 15px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;">
+                                        <h4 style="color: #166534; font-weight: bold; margin: 0 0 10px 0;"><i
+                                                class="fas fa-check-circle"></i> Remediation Status</h4>
+                                        <p id="remedialFeedbackText"
+                                            style="margin-top: 10px; font-style: italic; color: #1e293b;"></p>
+                                        <p id="remedialStatusText"
+                                            style="margin-top: 10px; font-weight: bold; font-size: 1.1rem;"></p>
+                                    </div>
+                                </div>
+
+                                <!-- Right side: Kortix AI Tutor Chat -->
+                                <div class="glass"
+                                    style="padding: 20px; border-radius: 15px; display: flex; flex-direction: column; height: 80vh; max-height: 700px; min-height: 400px; background: white;">
+                                     <div style="border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 10px;">
+                                        <h3 style="font-size: 1.1rem; font-weight: bold; color: #1e3a8a; margin: 0 0 5px 0; display: flex; align-items: center; justify-content: space-between;">
+                                            <span><i class="fas fa-robot text-primary"></i> Kortix AI Tutor</span>
+                                            <span id="kortixModelBadge" class="badge" style="background:#e0e7ff; color:#3730a3; font-size:0.75rem; padding:4px 10px; border-radius:12px; font-weight: 600; transition: all 0.3s ease;">
+                                                <i class="fas fa-bolt"></i> Powered by DeepSeek
+                                            </span>
+                                        </h3>
+                                        <small style="color: #64748b;">Ask questions or attach an image about this learning competency.</small>
+                                    </div>
+                                    <div id="tutorChatMessages"
+                                        style="flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 10px; background: #f8fafc; border-radius: 8px; margin-bottom: 10px;">
+                                        <div
+                                            style="background: #e2e8f0; padding: 8px 12px; border-radius: 8px; align-self: flex-start; max-width: 85%; font-size: 0.9rem; color: #334155;">
+                                            Hello! I am Kortix AI, your tutor. How can I help you understand this learning competency today?
+                                        </div>
+                                    </div>
+
+                                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                                        <div id="tutorImagePreviewContainer" style="display: none; align-items: center; gap: 8px; background: #fffbeb; padding: 6px 12px; border-radius: 8px; border: 1px solid #fde68a;">
+                                            <i class="fas fa-image" style="color: #d97706;"></i>
+                                            <span id="tutorImageFileName" style="font-size: 0.85rem; color: #b45309; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span>
+                                            <button type="button" onclick="clearTutorChatImage()" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.9rem;" title="Remove attached image">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                        <div style="display: flex; gap: 8px; align-items: center;">
+                                            <label for="tutorChatImageInput" style="cursor: pointer; padding: 8px; color: #3b82f6; background: #eff6ff; border-radius: 8px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; flex-shrink: 0; border: 1px solid #bfdbfe; margin: 0;" title="Attach Image for Gemini Vision Analysis">
+                                                <i class="fas fa-camera" style="font-size: 1.1rem;"></i>
+                                            </label>
+                                            <input type="file" id="tutorChatImageInput" accept="image/*" style="display: none;" onchange="handleTutorChatImageSelect(event)">
+                                            <input type="text" id="tutorChatInput" class="form-control"
+                                                style="flex-grow: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none;"
+                                                placeholder="Type your question or attach an image..."
+                                                onkeypress="if(event.key === 'Enter') sendTutorChatMessage()">
+                                            <button class="btn btn-primary" onclick="sendTutorChatMessage()"
+                                                style="background: #3b82f6; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-paper-plane"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Communication Section -->
+                <section id="communicationSection" class="content-section">
+                    <div class="glass" style="padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+                        <div class="card-header"
+                            style="margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <h3 style="margin: 0;"><i class="fas fa-comments"></i> Communication Hub</h3>
+                            <select id="studentCommReceiver" class="form-control"
+                                style="width: auto; border-radius: 20px; padding: 6px 12px; border: 1px solid #cbd5e1; outline: none; font-size: 0.9rem;"
+                                onchange="openStudentChat()">
+                                <option value="teacher">My Adviser</option>
+                                <option value="section">Section Group</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; flex-direction: column; height: 500px;">
+                            <div id="studentCommChatTitle"
+                                style="padding: 10px; background: #e0f7fa; font-weight: bold; border-radius: 8px 8px 0 0;">
+                                Select a chat
+                            </div>
+                            <div id="studentCommChatBox"
+                                style="flex: 1; background: #f8fafc; padding: 15px; overflow-y: auto; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 10px;">
+                                <div style="text-align: center; color: #888; padding: 20px;">Loading chat...</div>
+                            </div>
+                            <div
+                                style="display: flex; gap: 8px; padding: 12px 15px; background: #fff; border-top: 1px solid #e2e8f0; border-radius: 0 0 8px 8px; align-items: center;">
+                                <label for="studentCommAttachment"
+                                    style="cursor: pointer; padding: 10px; color: #0084ff; background: #f0f2f5; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; flex-shrink: 0;"
+                                    title="Attach Image" onmouseover="this.style.background='#e4e6eb'"
+                                    onmouseout="this.style.background='#f0f2f5'">
+                                    <i class="fas fa-image" style="font-size: 1.1rem;"></i>
+                                </label>
+                                <input type="file" id="studentCommAttachment" accept="image/*" style="display: none;"
+                                    onchange="document.getElementById('studentCommAttachmentPreview').innerText = this.files[0] ? this.files[0].name : ''; document.getElementById('studentCommAttachmentPreview').style.display = this.files[0] ? 'block' : 'none';">
+                                <div id="studentCommAttachmentPreview"
+                                    style="display: none; padding: 6px 12px; border-radius: 12px; font-size: 0.75rem; background: #e7f3ff; color: #0084ff; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 0;">
+                                </div>
+                                <input type="text" id="studentCommInput" class="form-control"
+                                    style="flex: 1; border: none; border-radius: 20px; padding: 10px 18px; background: #f0f2f5; font-size: 0.93rem; outline: none; min-width: 0;"
+                                    placeholder="Aa" onkeypress="if(event.key === 'Enter') sendStudentMessage()">
+                                <button
+                                    style="width: 38px; height: 38px; border-radius: 50%; background: #0084ff; border: none; cursor: pointer; color: #fff; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: background 0.15s, transform 0.1s; flex-shrink: 0;"
+                                    onmouseover="this.style.background='#0070d6'; this.style.transform='scale(1.05)'"
+                                    onmouseout="this.style.background='#0084ff'; this.style.transform='scale(1)'"
+                                    onclick="sendStudentMessage()">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Exams Section -->
+                <section id="examsSection" class="content-section">
+                    <!-- Exam Folders Controls Bar -->
+                    <div id="examFolderControlsBar" class="glass" style="padding: 15px 20px; border-radius: 15px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <button id="examFolderBackBtn" onclick="examFolderGoBack()" class="btn-secondary" style="display: none; background: #3b82f6; color: white; border: none; border-radius: 8px; padding: 7px 14px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </button>
+                            <div id="examFolderBreadcrumb" style="font-weight: 700; font-size: 1.1rem; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-folder-open" style="color: #3b82f6;"></i> <span>Online Examinations</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label style="font-size: 0.85rem; font-weight: 600; color: #475569; margin: 0; display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-filter text-primary"></i> Term:
+                            </label>
+                            <select id="examTermFilter" onchange="onExamTermFilterChange(this.value)" class="form-control" style="background: white; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 12px; font-size: 0.9rem; outline: none; width: auto; font-weight: 600;">
+                                <option value="">All Terms</option>
+                                <option value="1">Term 1</option>
+                                <option value="2">Term 2</option>
+                                <option value="3">Term 3</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="exams-grid" id="availableExams">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <div id="examInterface" style="display: none;">
+                        <div class="exam-header glass"
+                            style="margin-bottom: 20px; padding: 20px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                            <div>
+                                <h2 id="examTitleTitle">Term Examination</h2>
+                                <p id="examSubjectTitle">Subject Name</p>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                <button id="mathScratchpadBtn" class="btn-warning" onclick="toggleScratchpadModal()" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; border: none; background: #f59e0b; color: white; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);">
+                                    <i class="fas fa-drafting-compass"></i> Math Scratchpad
+                                </button>
+                                <button id="mathCalcBtn" class="btn-info" onclick="toggleCalculatorModal()" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; border: none; background: #0284c7; color: white; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);">
+                                    <i class="fas fa-calculator"></i> Calculator
+                                </button>
+                                <div class="exam-timer" id="examTimerDisplay">
+                                    <i class="fas fa-clock"></i>
+                                    <span id="timeRemaining">00:00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="examReadingText" class="glass"
+                            style="display: none; margin-bottom: 20px; padding: 20px; border-radius: 12px; background: #fffde7; border-left: 5px solid #fdd835; position: sticky; top: 100px; z-index: 90; max-height: 250px; overflow-y: auto;">
+                            <strong><i class="fas fa-book-reader"></i> Reading Passage:</strong>
+                            <div id="readingTextContent"
+                                style="margin-top: 10px; font-style: italic; line-height: 1.6;"></div>
+                        </div>
+                        <div id="examQuestionsContainer">
+                            <!-- Questions go here -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Enrollment Section -->
+                <section id="enrollmentSection" class="content-section">
+                    <div class="enrollment-container glass"
+                        style="padding: 40px; border-radius: 20px; max-width: 800px; margin: 0 auto;">
+                        <div class="text-center" style="margin-bottom: 30px;">
+                            <i class="fas fa-user-plus" style="font-size: 3rem; color: var(--primary);"></i>
+                            <h2>Online Enrollment</h2>
+                            <p>Verify your information and submit for registration.</p>
+                        </div>
+                        <div id="enrollmentStatus" class="enrollment-form">
+                            <!-- Populated based on status -->
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <label>Incoming Grade Level</label>
+                                    <p id="nextGradeLevel">--</p>
+                                </div>
+                                <div class="info-item">
+                                    <label>Academic Year</label>
+                                    <p id="nextSY">---</p>
+                                </div>
+                            </div>
+                            <div style="margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+                                <button class="btn-primary" onclick="processEnrollment()">
+                                    Submit Enrollment Request
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Exam Results Section -->
+                <section id="examResultsSection" class="content-section">
+                    <!-- List View -->
+                    <div id="examResultsList" class="grades-container glass">
+                        <div class="card-header">
+                            <h3>Term Examination Results</h3>
+                        </div>
+
+                        <!-- Filters -->
+                        <div
+                            style="display: flex; gap: 15px; padding: 15px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                            <div style="flex: 1;">
+                                <label
+                                    style="display: block; font-size: 0.85rem; font-weight: 600; color: #64748b; margin-bottom: 5px;">
+                                    <i class="fas fa-calendar-alt"></i> Term
+                                </label>
+                                <select id="examResultsQuarterFilter" class="form-control"
+                                    onchange="filterExamResults()"
+                                    style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid #cbd5e1;">
+                                    <option value="">All Terms</option>
+                                    <option value="1">Term 1</option>
+                                    <option value="2">Term 2</option>
+                                    <option value="3">Term 3</option>
+                                </select>
+                            </div>
+                            <div style="flex: 1;">
+                                <label
+                                    style="display: block; font-size: 0.85rem; font-weight: 600; color: #64748b; margin-bottom: 5px;">
+                                    <i class="fas fa-book"></i> Subject
+                                </label>
+                                <select id="examResultsSubjectFilter" class="form-control"
+                                    onchange="filterExamResults()"
+                                    style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid #cbd5e1;">
+                                    <option value="">All Subjects</option>
+                                    <!-- Subjects will be populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="table-container">
+                            <table class="report-card-table" id="examResultsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Examination</th>
+                                        <th>Subject</th>
+                                        <th>Term</th>
+                                        <th>Score</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="7" class="text-center">Loading results...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Detail View (Hidden by default) -->
+                    <div id="examResultDetails" class="glass"
+                        style="display: none; padding: 30px; border-radius: 20px;">
+                        <button onclick="closeExamDetails()" class="btn-secondary" style="margin-bottom: 20px;">
+                            <i class="fas fa-arrow-left"></i> Back to Results
+                        </button>
+
+                        <div class="card-header"
+                            style="justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px;">
+                            <div>
+                                <h2 id="detailExamTitle">Exam Title</h2>
+                                <p id="detailExamInfo">Subject | Term</p>
+                            </div>
+                            <div class="score-badge" id="detailExamScore"
+                                style="background: var(--primary); color: white; padding: 10px 20px; border-radius: 50px; font-weight: bold; font-size: 1.2rem;">
+                                Score: 0/0
+                            </div>
+                            </div>
+                        </div>
+
+                        <!-- Item Analysis -->
+                        <div style="margin-bottom: 30px;">
+                            <h3>Item Analysis</h3>
+                            <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+                                <table class="report-card-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Question</th>
+                                            <th>Your Answer</th>
+                                            <th>Correct Answer</th>
+                                            <th>Result</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="detailItemsBody">
+                                        <!-- Items go here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Parent Signature Section -->
+                        <div class="signature-section"
+                            style="background: #f8fafc; padding: 25px; border-radius: 15px; border: 1px solid #e2e8f0;">
+                            <h3>Parent / Guardian Signature</h3>
+                            <p>To confirm that you have reviewed these examination results, please sign below.</p>
+
+                            <!-- Add Parent Comment Box here -->
+                            <div class="form-group" style="margin-top: 15px; margin-bottom: 15px;">
+                                <label style="font-weight: 600; color: #333; margin-bottom: 5px; display: block;">Parent's Comment / Feedback (Optional)</label>
+                                <textarea id="parentComment" class="form-control" rows="3" placeholder="Enter your comments regarding the student's performance here..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; resize: vertical;"></textarea>
+                            </div>
+
+                            <div id="signatureDisplay" style="display: none; margin-top: 15px;">
+                                <img id="savedSignature" src="" alt="Parent Signature"
+                                    style="max-width: 300px; border: 1px dashed #ccc; padding: 10px; background: white;">
+                                <p style="color: green; margin-top: 10px;"><i class="fas fa-check-circle"></i> Signed on
+                                    <span id="signedDate"></span>
+                                </p>
+                            </div>
+
+                            <div id="signaturePadContainer" style="margin-top: 15px;">
+                                <canvas id="signCanvas" width="400" height="200"
+                                    style="border: 2px dashed #cbd5e1; background: white; cursor: crosshair; touch-action: none; border-radius: 8px; width: 100%; max-width: 400px;"></canvas>
+                                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                                    <button class="btn-secondary" onclick="clearSignature()">Clear</button>
+                                    <button class="btn-primary" onclick="saveSignature()">Proceed & Save</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Printing Actions - REMOVED FOR STUDENT PORTAL -->
+                        <!-- Students should not be able to print/download their own slips -->
+                    </div>
+                </section>
+
+                <!-- BMI Section -->
+                <section id="bmiSection" class="content-section">
+                    <div class="glass"
+                        style="padding: 30px; border-radius: 20px; max-width: 600px; margin: 0 auto; text-align: center;">
+                        <i class="fas fa-weight"
+                            style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
+                        <h2>Nutritional Status</h2>
+                        <p style="color: #666; margin-bottom: 30px;">Please provide your current height and weight. This
+                            information will be sent to your adviser.</p>
+
+                        <div
+                            style="text-align: left; background: rgba(255,255,255,0.5); padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label style="font-weight: 600; color: #333; margin-bottom: 5px; display: block;">Height
+                                    (in meters, e.g. 1.52)</label>
+                                <input type="number" id="studentInputHeight" step="0.01" min="0.5" max="2.5"
+                                    class="form-control"
+                                    style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-weight: 600; color: #333; margin-bottom: 5px; display: block;">Weight
+                                    (in kg, e.g. 45.5)</label>
+                                <input type="number" id="studentInputWeight" step="0.1" min="10" max="200"
+                                    class="form-control"
+                                    style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1;">
+                            </div>
+                        </div>
+
+                        <div id="studentBMIResult"
+                            style="margin-bottom: 20px; display: none; padding: 15px; border-radius: 10px; font-weight: bold;">
+                        </div>
+
+                        <button class="btn-primary btn-large" onclick="submitStudentBMI()" style="width: 100%;">
+                            <i class="fas fa-save"></i> Save Nutritional Data
+                        </button>
+                    </div>
+                </section>
+
+                <div id="printSlip" class="print-slip"></div>
+
+                <!-- Profile Section -->
+                <section id="profileSection" class="content-section">
+                    <div class="profile-grid">
+                        <div class="profile-card glass">
+                            <div class="profile-main">
+                                <div class="profile-avatar">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                                <h2 id="profileFullName">Student Full Name</h2>
+                                <p id="profileLrn" class="lrn-tag">LRN: 123456789012</p>
+                            </div>
+                            <div class="profile-details">
+                                <div class="detail-item">
+                                    <label>Section</label>
+                                    <p id="profileSectionName">--</p>
+                                </div>
+                                <div class="detail-item">
+                                    <label>Grade Level</label>
+                                    <p id="profileGradeLevel">--</p>
+                                </div>
+                                <div class="detail-item">
+                                    <label>Status</label>
+                                    <p id="profileStatus" class="active-badge">Active</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-card glass">
+                            <h3>Personal Information</h3>
+                            <div class="info-grid">
+                                <div class="info-item"><label>Birth Date</label><span id="p_birthdate">--</span></div>
+                                <div class="info-item"><label>Email</label><span id="p_email">--</span></div>
+                                <div class="info-item"><label>Mobile</label><span id="p_mobile">--</span></div>
+                                <div class="info-item"><label>Address</label><span id="p_address">--</span></div>
+                            </div>
+                            <h3 style="margin-top: 40px;">Parent / Guardian</h3>
+                            <div class="info-grid">
+                                <div class="info-item"><label>Father's Name</label><span id="p_father">--</span></div>
+                                <div class="info-item"><label>Mother's Name</label><span id="p_mother">--</span></div>
+                                <div class="info-item"><label>Contact Number</label><span id="p_p_contact">--</span>
+                                </div>
+                            </div>
+                            <h3 style="margin-top: 40px;">Account Settings</h3>
+                            <div class="info-grid">
+                                <div class="info-item" style="grid-column: 1 / -1;">
+                                    <button class="btn-secondary"
+                                        onclick="document.getElementById('photoUploadInput').click()">
+                                        <i class="fas fa-camera"></i> Change Profile Picture
+                                    </button>
+                                    <input type="file" id="photoUploadInput" style="display: none;" accept="image/*"
+                                        onchange="uploadProfilePhoto(event)">
+
+                                    <button class="btn-secondary" onclick="showChangePasswordModal()"
+                                        style="margin-left: 10px;">
+                                        <i class="fas fa-key"></i> Change Password
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Change Password Modal -->
+                <div id="changePasswordModal" class="glass"
+                    style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 90%; max-width: 400px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+                    <h3>Change Password</h3>
+                    <form id="changePasswordForm" onsubmit="submitChangePassword(event)">
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Current Password / Birthdate</label>
+                            <input type="password" id="currentPassword" class="form-control" required
+                                style="width: 100%; padding: 8px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>New Password</label>
+                            <input type="password" id="newPassword" class="form-control" required
+                                style="width: 100%; padding: 8px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Confirm New Password</label>
+                            <input type="password" id="confirmNewPassword" class="form-control" required
+                                style="width: 100%; padding: 8px;">
+                        </div>
+                        <div id="passwordError" style="color: red; margin-bottom: 10px; display: none;"></div>
+                        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                            <button type="button" class="btn-secondary"
+                                onclick="hideChangePasswordModal()">Cancel</button>
+                            <button type="submit" class="btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- SSLG Election Section -->
+                <section id="electionSection" class="content-section">
+                    <div class="election-container">
+                        <!-- Election Header -->
+                        <div id="electionHeader" class="election-header glass">
+                            <div class="election-info">
+                                <h2 id="electionTitle">SSLG Election</h2>
+                                <p id="electionDescription">Cast your vote for your student leaders</p>
+                                <div class="election-meta">
+                                    <span class="badge" id="electionStatus">Loading...</span>
+                                    <span id="electionSchedule"></span>
+                                </div>
+                            </div>
+                            <div class="election-actions">
+                                <button class="btn-secondary" onclick="showElectionResults()" id="viewResultsBtn"
+                                    style="display: none;">
+                                    <i class="fas fa-chart-bar"></i> View Results
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Already Voted Message -->
+                        <div id="alreadyVotedMessage" class="already-voted glass" style="display: none;">
+                            <i class="fas fa-check-circle"></i>
+                            <h3>Thank you for voting!</h3>
+                            <p>You have already cast your vote in this election.</p>
+                            <button class="btn-primary" onclick="showElectionResults()">
+                                <i class="fas fa-chart-bar"></i> View Results
+                            </button>
+                        </div>
+
+                        <!-- Voting Form -->
+                        <div id="votingForm" style="display: none;">
+                            <div class="voting-instructions glass">
+                                <i class="fas fa-info-circle"></i>
+                                <p>Select your preferred candidate(s) for each position. Some positions may allow
+                                    multiple selections. Once you submit, your vote cannot be changed.</p>
+                            </div>
+
+                            <div id="positionsContainer">
+                                <!-- Positions and candidates will be loaded here -->
+                            </div>
+
+                            <div class="vote-submit-section glass">
+                                <button class="btn-primary btn-large" onclick="submitVotes()" id="submitVoteBtn">
+                                    <i class="fas fa-vote-yea"></i> Submit My Vote
+                                </button>
+                                <p class="warning-text"><i class="fas fa-exclamation-triangle"></i> Your vote is final
+                                    and cannot be changed after submission.</p>
+                            </div>
+                        </div>
+
+                        <!-- No Active Election -->
+                        <div id="noElectionMessage" class="no-election glass" style="display: none;">
+                            <i class="fas fa-calendar-times"></i>
+                            <h3>No Active Election</h3>
+                            <p>There is currently no active election. Please check back later.</p>
+                        </div>
+
+                        <!-- Election Results View -->
+                        <div id="electionResultsView" class="results-view" style="display: none;">
+                            <div class="results-header glass">
+                                <h3><i class="fas fa-chart-bar"></i> Election Results</h3>
+                                <button class="btn-secondary" onclick="hideElectionResults()">
+                                    <i class="fas fa-arrow-left"></i> Back
+                                </button>
+                            </div>
+                            <div id="resultsContent">
+                                <!-- Results will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PTA Accountability Section -->
+                <section id="ptaAccountabilitySection" class="content-section">
+                    <div class="glass" style="padding: 20px; border-radius: 15px;">
+                        <div class="card-header">
+                            <h3>PTA Voluntary Contribution</h3>
+                        </div>
+
+                        <!-- Account Status -->
+                        <div id="ptaAccountStatus" class="info-grid" style="margin-bottom: 20px;">
+                            <div class="info-item">
+                                <label>Plan</label>
+                                <p id="ptaPlanName">Loading...</p>
+                            </div>
+                            <div class="info-item">
+                                <label>Amount Due</label>
+                                <p id="ptaAmountDue">Loading...</p>
+                            </div>
+                            <div class="info-item">
+                                <label>Balance</label>
+                                <p id="ptaBalance" style="font-weight: bold; color: var(--danger);">Loading...</p>
+                            </div>
+                        </div>
+
+                        <!-- Payments Table -->
+                        <h4>Payment History</h4>
+                        <div class="table-container" style="margin-bottom: 30px;">
+                            <table class="report-card-table" id="ptaPaymentsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Receipt #</th>
+                                        <th>Type</th>
+                                        <th>Method</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="5" class="text-center">No records found</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Sibling Settings -->
+                        <div style="border-top: 1px solid #eee; padding-top: 20px;">
+                            <h4><i class="fas fa-users"></i> Sibling Settings</h4>
+                            <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">Tag your siblings to easily
+                                identify them for contributions.</p>
+
+                            <!-- Trigger Modal -->
+                            <button class="btn-primary" onclick="showSiblingModal()" style="margin-bottom: 15px;">
+                                <i class="fas fa-plus"></i> Add Sibling
+                            </button>
+
+                            <!-- Sibling List -->
+                            <div id="ptaSiblingsList" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <!-- Sibling items injected here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sibling Search Modal -->
+                    <div id="siblingModal" class="glass"
+                        style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 90%; max-width: 500px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+                        <h3>Add Sibling</h3>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Grade Level</label>
+                            <select id="siblingSearchGrade" class="form-control" onchange="loadSiblingSections()"
+                                style="width: 100%; padding: 8px;">
+                                <option value="">All Grades</option>
+                                <option value="7">Grade 7</option>
+                                <option value="8">Grade 8</option>
+                                <option value="9">Grade 9</option>
+                                <option value="10">Grade 10</option>
+                                <option value="11">Grade 11</option>
+                                <option value="12">Grade 12</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Section</label>
+                            <select id="siblingSearchSection" class="form-control" style="width: 100%; padding: 8px;">
+                                <option value="">All Sections</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Search Name/LRN</label>
+                            <input type="text" id="siblingSearchInput" class="form-control" placeholder="Search..."
+                                onkeyup="searchSiblings()" style="width: 100%; padding: 8px;">
+                        </div>
+
+                        <div id="siblingSearchResults"
+                            style="max-height: 200px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px; margin-bottom: 15px;">
+                            <!-- Results -->
+                        </div>
+
+                        <div style="text-align: right; gap: 10px; display: flex; justify-content: flex-end;">
+                            <button class="btn-secondary" onclick="closeSiblingModal()">Cancel</button>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Aral Tutor Section -->
+                <section id="aralTutorSection" class="content-section">
+                    <div class="glass" style="padding: 30px; border-radius: 15px; margin-bottom: 20px;">
+                        <div class="card-header" style="margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                            <h3 style="margin: 0; color: #8b5cf6;"><i class="fas fa-brain"></i> Aral Tutor AI</h3>
+                        </div>
+                        
+                        <div id="aralTutorContent" style="text-align: center; padding: 40px 20px;">
+                            <i class="fas fa-robot" style="font-size: 4rem; color: #8b5cf6; margin-bottom: 20px;"></i>
+                            <h2 style="margin-bottom: 15px;">Welcome to Aral Tutor</h2>
+                            <p style="color: #64748b; font-size: 1.1rem; max-width: 600px; margin: 0 auto 30px;">
+                                Your Personalized AI Reading Companion. Aral Tutor will guide you through passages, listen to you read, and help improve your comprehension.
+                            </p>
+                            
+                            <!-- TWO ROOMS SYSTEM -->
+                            <div style="display: flex; gap: 20px; justify-content: center; margin-top: 30px;">
+                                <!-- English Room -->
+                                <div class="glass" style="padding: 30px; border-radius: 15px; width: 300px; border: 2px solid #3b82f6; cursor: pointer; transition: transform 0.2s;" onclick="enterAralRoom('en')">
+                                    <i class="fas fa-book-open" style="font-size: 3rem; color: #3b82f6; margin-bottom: 15px;"></i>
+                                    <h3 style="color: #1e3a8a; margin-bottom: 10px;">English Room</h3>
+                                    <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px;">Practice Phil-IRI English Reading.</p>
+                                    <div id="aralEnglishStatusBtn" class="btn-primary" style="background: #3b82f6; width: 100%;">
+                                        <i class="fas fa-spinner fa-spin"></i> Loading...
+                                    </div>
+                                </div>
+                                
+                                <!-- Filipino Room -->
+                                <div class="glass" style="padding: 30px; border-radius: 15px; width: 300px; border: 2px solid #eab308; cursor: pointer; transition: transform 0.2s;" onclick="enterAralRoom('ph')">
+                                    <i class="fas fa-book" style="font-size: 3rem; color: #eab308; margin-bottom: 15px;"></i>
+                                    <h3 style="color: #854d0e; margin-bottom: 10px;">Filipino Room</h3>
+                                    <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px;">Practice Phil-IRI Filipino Reading.</p>
+                                    <div id="aralFilipinoStatusBtn" class="btn-primary" style="background: #eab308; width: 100%; border: none;">
+                                        <i class="fas fa-spinner fa-spin"></i> Loading...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- AI Reading Interface (Hidden by Default) -->
+                        <div id="aralTutorInterface" style="display: none;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                <button class="btn-secondary" onclick="exitAralTutor()">
+                                    <i class="fas fa-arrow-left"></i> Exit Tutor
+                                </button>
+                                <button class="btn-primary" id="aralSubmitBtn" onclick="submitAralReading()" style="background: #10b981; display: none;">
+                                    <i class="fas fa-check-circle"></i> Submit Reading Evaluation
+                                </button>
+                            </div>
+                            
+                            <div id="aralReadingPhase">
+                                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; margin-bottom: 20px; max-height: 350px; overflow-y: auto;">
+                                    <h4 id="aralReadingTitle" style="font-size: 1.2rem; color: #1e293b; margin-bottom: 15px;">Reading Passage</h4>
+                                    <div id="aralReadingText" style="font-size: 1.1rem; line-height: 1.8; color: #334155; font-family: Georgia, serif;">
+                                        Loading passage...
+                                    </div>
+                                </div>
+                                
+                                <div style="text-align: center; padding: 20px;">
+                                    <p id="aralTutorStatus" style="color: #64748b; margin-bottom: 15px; font-size: 1.1rem; font-weight: bold;">Click the microphone and start reading the passage out loud.</p>
+                                    <button id="aralMicBtn" class="btn-primary" style="background: #ef4444; border-radius: 50%; width: 70px; height: 70px; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); transition: transform 0.2s;" onclick="toggleAralMic()">
+                                        <i class="fas fa-microphone"></i>
+                                    </button>
+                                    <p id="aralListeningIndicator" style="display: none; color: #10b981; font-weight: bold; margin-top: 15px; animation: pulse 1.5s infinite;">
+                                        <i class="fas fa-circle"></i> Listening... (Click Mic again to Stop)
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <!-- Comprehension Phase (Hidden Initially) -->
+                            <div id="aralComprehensionPhase" style="display: none;">
+                                <div style="background: #fdf2f8; border: 1px solid #fbcfe8; border-radius: 12px; padding: 25px; margin-bottom: 20px;">
+                                    <h4 style="font-size: 1.2rem; color: #be185d; margin-bottom: 15px;"><i class="fas fa-brain"></i> Kortix AI Comprehension Check</h4>
+                                    <p style="color: #831843; margin-bottom: 20px; font-style: italic;">"Great reading! Now let's see how well you understood the story. I'll ask you a few questions."</p>
+                                    
+                                    <div id="comprehensionQuestionsContainer" style="display: flex; flex-direction: column; gap: 20px;">
+                                        <!-- Questions will be injected here -->
+                                    </div>
+                                    
+                                    <div style="text-align: center; margin-top: 30px;">
+                                        <button class="btn-primary" id="aralFinishBtn" onclick="finishAralDiagnostic()" style="background: #be185d; font-size: 1.1rem; padding: 10px 25px;">
+                                            <i class="fas fa-paper-plane"></i> Submit Answers
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Submission Modal -->
+    <div id="submissionModal" class="glass"
+        style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 90%; max-width: 500px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+        <h3 style="margin-bottom: 15px;"><i class="fas fa-upload"></i> Submit Work</h3>
+        <p style="margin-bottom: 20px; color: #666;">Upload your file or type your answer below.</p>
+        <form id="submissionForm">
+            <input type="hidden" id="sub_activity_id" name="activity_id">
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Attach File</label>
+                <input type="file" id="sub_file" name="file" class="form-control"
+                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Or Type Answer</label>
+                <textarea id="sub_text" name="text_content" class="form-control" rows="4"
+                    style="width: 100%; border-radius: 8px; border: 1px solid #ddd; padding: 10px;"
+                    placeholder="Type your answer here..."></textarea>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn-secondary"
+                    onclick="document.getElementById('submissionModal').style.display='none'">Cancel</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-paper-plane"></i> Submit</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Math Scratchpad Modal (Floating & Interactive) -->
+    <div id="mathScratchpadModal" style="display: none; position: fixed; bottom: 20px; left: 20px; z-index: 99999; width: 420px; background: #0f172a; border: 2px solid #f59e0b; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); color: white; font-family: sans-serif; overflow: hidden; backdrop-filter: blur(10px);">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: #1e293b; border-bottom: 1px solid #334155; cursor: move;" id="scratchpadHeader">
+            <span style="font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-drafting-compass" style="color: #f59e0b;"></i> Digital Math Scratchpad
+            </span>
+            <button onclick="toggleScratchpadModal()" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 16px;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div style="padding: 10px; background: #0f172a;">
+            <div style="display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; align-items: center;">
+                <button onclick="setScratchColor('#ffffff')" style="width: 24px; height: 24px; border-radius: 50%; background: #ffffff; border: 2px solid #94a3b8; cursor: pointer;" title="White"></button>
+                <button onclick="setScratchColor('#60a5fa')" style="width: 24px; height: 24px; border-radius: 50%; background: #60a5fa; border: none; cursor: pointer;" title="Blue"></button>
+                <button onclick="setScratchColor('#f87171')" style="width: 24px; height: 24px; border-radius: 50%; background: #f87171; border: none; cursor: pointer;" title="Red"></button>
+                <button onclick="setScratchColor('#4ade80')" style="width: 24px; height: 24px; border-radius: 50%; background: #4ade80; border: none; cursor: pointer;" title="Green"></button>
+                <button onclick="setScratchColor('#facc15')" style="width: 24px; height: 24px; border-radius: 50%; background: #facc15; border: none; cursor: pointer;" title="Yellow"></button>
+                <button onclick="setScratchTool('eraser')" id="scratchEraserBtn" style="padding: 4px 8px; border-radius: 6px; background: #334155; color: white; border: none; font-size: 11px; cursor: pointer;" title="Eraser">
+                    <i class="fas fa-eraser"></i> Eraser
+                </button>
+                <button onclick="clearScratchpadCanvas()" style="padding: 4px 8px; border-radius: 6px; background: #ef4444; color: white; border: none; font-size: 11px; cursor: pointer; margin-left: auto;" title="Clear Canvas">
+                    <i class="fas fa-trash"></i> Clear
+                </button>
+            </div>
+            <canvas id="scratchpadCanvas" width="400" height="260" style="background: #1e293b; border-radius: 10px; border: 1px solid #334155; cursor: crosshair; touch-action: none; display: block;"></canvas>
+            <div style="font-size: 10px; color: #94a3b8; margin-top: 6px; text-align: center;">
+                💡 Solve math equations here directly on screen without turning away from camera.
+            </div>
+        </div>
+    </div>
+
+    <!-- Math Calculator Modal (Floating Scientific/Standard Calculator) -->
+    <div id="mathCalcModal" style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 99999; width: 280px; background: #0f172a; border: 2px solid #0284c7; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); color: white; font-family: monospace; overflow: hidden;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #1e293b; border-bottom: 1px solid #334155; cursor: move;" id="calcHeader">
+            <span style="font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 6px; font-family: sans-serif;">
+                <i class="fas fa-calculator" style="color: #38bdf8;"></i> Math Calculator
+            </span>
+            <button onclick="toggleCalculatorModal()" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 14px;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div style="padding: 12px;">
+            <input type="text" id="calcDisplay" readonly value="0" style="width: 100%; height: 42px; background: #020617; border: 1px solid #334155; border-radius: 8px; color: #38bdf8; text-align: right; font-size: 20px; padding: 5px 10px; font-family: monospace; margin-bottom: 10px; box-sizing: border-border-box;">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+                <button onclick="calcPress('C')" style="padding: 10px; border-radius: 6px; background: #ef4444; color: white; border: none; font-size: 13px; font-weight: bold; cursor: pointer;">C</button>
+                <button onclick="calcPress('(')" style="padding: 10px; border-radius: 6px; background: #334155; color: white; border: none; font-size: 13px; font-weight: bold; cursor: pointer;">(</button>
+                <button onclick="calcPress(')')" style="padding: 10px; border-radius: 6px; background: #334155; color: white; border: none; font-size: 13px; font-weight: bold; cursor: pointer;">)</button>
+                <button onclick="calcPress('/')" style="padding: 10px; border-radius: 6px; background: #0284c7; color: white; border: none; font-size: 13px; font-weight: bold; cursor: pointer;">÷</button>
+
+                <button onclick="calcPress('7')" style="padding: 10px; border-radius: 6px; background: #1e293b; color: white; border: none; font-size: 14px; font-weight: bold; cursor: pointer;">7</button>
+                <button onclick="calcPress('8')" style="padding: 10px; border-radius: 6px; background: #1e293b; color: white; border: none; font-size: 14px; font-weight: bold; cursor: pointer;">8</button>
+                <button onclick="calcPress('9')" style="padding: 10px; border-radius: 6px; background: #1e293b; color: white; border: none; font-size: 14px; font-weight: bold; cursor: pointer;">9</button>
+                <button onclick="calcPress('*')" style="padding: 10px; border-radius: 6px; background: #0284c7; color: white; border: none; font-size: 13px; font-weight: bold; cursor: pointer;">×</button>
+
+                <button onclick="calcPress('4')" style="padding: 10px; border-radius: 6px; background: #1e293b; color: white; border: none; font-size: 14px; font-weight: bold; cursor: pointer;">4</button>
+                <button onclick="calcPress('5')" style="padding: 10px; border-radius: 6px; background: #1e293b; color: white; border: none; font-size: 14px; font-weight: bold; cursor: pointer;">5</button>
+                <button onclick="calcPress('6')" style="padding: 10px; border-radius: 6px; background: #1e293b; color: white; border: none; font-size: 14px; font-weight: bold; cursor: pointer;">6</button>
+                <button onclick="calcPress('-')" style="padding: 10px; border-radius: 6px; background: #0284c7; color: white; border: none; font-size: 13px; font-weight: bold; cursor: pointer;">-</button>
+
+                <button onclick="calcPress('1')" style="padding: 10px; border-radius: 6px; background: #1e293b; color: white; border: none; font-size: 14px; font-weight: bold; cursor: pointer;">1</button>
+                <button onclick="calcPress('2')" style="padding: 10px; border-radius: 6px; background: #1e293b; color: white; border: none; font-size: 14px; font-weight: bold; cursor: pointer;">2</button>
+                <button onclick="calcPress('3')" style="padding: 10px; border-radius: 6px; background: #1e293b; color: white; border: none; font-size: 14px; font-weight: bold; cursor: pointer;">3</button>
+                <button onclick="calcPress('+')" style="padding: 10px; border-radius: 6px; background: #0284c7; color: white; border: none; font-size: 13px; font-weight: bold; cursor: pointer;">+</button>
+
+                <button onclick="calcPress('0')" style="padding: 10px; border-radius: 6px; background: #1e293b; color: white; border: none; font-size: 14px; font-weight: bold; cursor: pointer;">0</button>
+                <button onclick="calcPress('.')" style="padding: 10px; border-radius: 6px; background: #1e293b; color: white; border: none; font-size: 14px; font-weight: bold; cursor: pointer;">.</button>
+                <button onclick="calcPress('sqrt')" style="padding: 10px; border-radius: 6px; background: #334155; color: #38bdf8; border: none; font-size: 12px; font-weight: bold; cursor: pointer;">√</button>
+                <button onclick="calcPress('=')" style="padding: 10px; border-radius: 6px; background: #10b981; color: white; border: none; font-size: 14px; font-weight: bold; cursor: pointer;">=</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Form submission logic moved to app.js
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="js/offline-exam-manager.js"></script>
+    <script src="app.js?v=11-offline-capacitor-ready"></script>
+    <script src="communication.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed', err));
+            });
+        }
+    </script>
+</body>
+
+</html>

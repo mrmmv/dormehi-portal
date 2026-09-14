@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Early Registration | DSMSMNHS</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #d97706;
+            --white: #ffffff;
+            --light: #f8fafc;
+            --text: #334155;
+            --overlay: rgba(15, 23, 42, 0.85);
+            --success: #10b981;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--light);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            position: relative;
+            margin: 2rem;
+        }
+
+        .header {
+            background: var(--primary);
+            color: var(--white);
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .logo-area {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-area img {
+            width: 40px;
+        }
+
+        .step-progress {
+            display: flex;
+            justify-content: space-between;
+            padding: 1.5rem 3rem;
+            background: #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .step-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            width: 100%;
+            height: 3px;
+            background: #cbd5e1;
+            z-index: -1;
+        }
+
+        .step-item.active .step-circle {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .step-item.completed .step-circle {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .step-item.completed:not(:last-child)::after {
+            background: var(--success);
+        }
+
+        .step-circle {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .step-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .content-area {
+            padding: 2rem 3rem;
+            min-height: 400px;
+        }
+
+        .form-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-family: 'Playfair Display', serif;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 0.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #475569;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(217, 119, 6, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: #b45309;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        /* Upload Box */
+        .upload-box {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .upload-box:hover {
+            border-color: var(--accent);
+            background: #fffbeb;
+        }
+
+        .upload-box i {
+            font-size: 2rem;
+            color: #94a3b8;
+            margin-bottom: 1rem;
+        }
+
+        /* Signature Canvas */
+        canvas {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: crosshair;
+            background: #fff;
+        }
+
+        /* Success Page */
+        .success-content {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: var(--success);
+            margin-bottom: 1rem;
+        }
+
+        .unique-code {
+            background: #f1f5f9;
+            padding: 1.5rem;
+            border-radius: 12px;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 1.5rem 0;
+            border: 2px dashed var(--primary);
+            letter-spacing: 2px;
+        }
+
+        .screenshot-hint {
+            color: #ef4444;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* Agreement Modal */
+        .agreement-text {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #f8fafc;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 640px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .step-label {
+                display: none;
+            }
+
+            .container {
+                margin: 0;
+                border-radius: 0;
+                min-height: 100vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo-area">
+                <img src="logo.png" alt="Logo">
+            </div>
+            <h1>Early Enrollment</h1>
+            <p id="syDisplay">School Year 2026-2027</p>
+        </div>
+
+        <div class="step-progress">
+            <div class="step-item active" id="stepIndicator1">
+                <div class="step-circle">1</div>
+                <div class="step-label">Agreement</div>
+            </div>
+            <div class="step-item" id="stepIndicator2">
+                <div class="step-circle">2</div>
+                <div class="step-label">Basic Info</div>
+            </div>
+            <div class="step-item" id="stepIndicator3">
+                <div class="step-circle">3</div>
+                <div class="step-label">Uploads</div>
+            </div>
+            <div class="step-item" id="stepIndicator4">
+                <div class="step-circle">4</div>
+                <div class="step-label">Health</div>
+            </div>
+        </div>
+
+        <div class="content-area">
+
+            <!-- Step 1: Agreement -->
+            <div class="form-section active" id="step1">
+                <h2>Data Privacy Agreement</h2>
+                <div class="agreement-text">
+                    <p><strong>DATA PRIVACY CONSENT</strong></p>
+                    <p>By proceeding with this Early Enrollment Registration, you agree to the collection and processing
+                        of your personal data and that of the learner in accordance with the Data Privacy Act of 2012.
+                    </p>
+                    <br>
+                    <p>All information provided creates a record of the learner's application for enrollment. We protect
+                        this data under strict confidentiality and security measures.</p>
+                    <br>
+                    <p><strong>REQUIREMENTS CHECKLIST:</strong></p>
+                    <ul>
+                        <li>Report Card (SF9) - Soft Copy</li>
+                        <li>PSA Birth Certificate - Soft Copy</li>
+                        <li>Signed Health Declaration Form (Digital Signature)</li>
+                    </ul>
+                    <br>
+                    <p>Please ensure all information is accurate and true.</p>
+                </div>
+                <div class="input-group">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="agreeCheck" style="width: 20px; height: 20px;">
+                        I have read and agree to the terms and conditions.
+                    </label>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="nextStep(2)" id="btnStep1" disabled>Proceed to Registration
+                        <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 2: Basic Info -->
+            <div class="form-section" id="step2">
+                <h2>Learner Information</h2>
+                <form id="infoForm">
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label>First Name</label>
+                            <input type="text" class="form-control" name="first_name" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Last Name</label>
+                            <input type="text" class="form-control" name="last_name" required>
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label>Middle Name</label>
+                            <input type="text" class="form-control" name="middle_name">
+                        </div>
+                        <div class="input-group">
+                            <label>Extension Name (e.g. Jr.)</label>
+                            <input type="text" class="form-control" name="extension_name">
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label>Birthrate</label>
+                            <input type="date" class="form-control" name="birthdate" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Gender</label>
+                            <select class="form-control" name="gender" required>
+                                <option value="">Select...</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label>Grade Level to Enroll</label>
+                            <select class="form-control" name="grade_level_to_enroll" required>
+                                <option value="">Select...</option>
+                                <option value="7">Grade 7</option>
+                                <option value="8">Grade 8</option>
+                                <option value="9">Grade 9</option>
+                                <option value="10">Grade 10</option>
+                                <option value="11">Grade 11</option>
+                                <option value="12">Grade 12</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>LRN (Optional)</label>
+                            <input type="text" class="form-control" name="lrn"
+                                placeholder="12-digit Learner Reference No.">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>PSA Birth Certificate No.</label>
+                        <input type="text" class="form-control" name="psa_birth_cert_no">
+                    </div>
+                    <div class="input-group">
+                        <label>Complete Address</label>
+                        <textarea class="form-control" name="address" rows="2" required></textarea>
+                    </div>
+                    <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #e2e8f0;">
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label>Guardian Name</label>
+                            <input type="text" class="form-control" name="guardian_name" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Contact Number</label>
+                            <input type="text" class="form-control" name="contact_number" required>
+                        </div>
+                    </div>
+                </form>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="prevStep(1)">Back</button>
+                    <button class="btn btn-primary" onclick="submitInfo()">Next: Uploads <i
+                            class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 3: Uploads -->
+            <div class="form-section" id="step3">
+                <h2>Document Requirements</h2>
+                <p style="margin-bottom: 2rem; color: #64748b;">Please upload clear copies of the following documents.
+                    (Image or PDF)</p>
+
+                <div class="upload-box" onclick="document.getElementById('reportCard').click()">
+                    <i class="fas fa-file-invoice"></i>
+                    <h3>Report Card (SF9)</h3>
+                    <p id="reportCardName">Click to browse...</p>
+                    <input type="file" id="reportCard" hidden accept="image/*,.pdf"
+                        onchange="updateFileName('reportCard', 'reportCardName')">
+                </div>
+
+                <div class="upload-box" onclick="document.getElementById('birthCert').click()">
+                    <i class="fas fa-baby"></i>
+                    <h3>PSA Birth Certificate</h3>
+                    <p id="birthCertName">Click to browse...</p>
+                    <input type="file" id="birthCert" hidden accept="image/*,.pdf"
+                        onchange="updateFileName('birthCert', 'birthCertName')">
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="prevStep(2)">Back</button>
+                    <button class="btn btn-primary" onclick="submitFiles()">Next: Health Declaration <i
+                            class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 4: Health Declaration -->
+            <div class="form-section" id="step4">
+                <h2>Health Declaration</h2>
+                <div style="margin-bottom: 1.5rem;">
+                    <p>Has the student experienced any of the following symptoms in the past 14 days?</p>
+                    <div class="input-group">
+                        <label><input type="checkbox" name="symptom" value="Fever"> Fever</label>
+                        <label><input type="checkbox" name="symptom" value="Cough"> Cough</label>
+                        <label><input type="checkbox" name="symptom" value="Sore Throat"> Sore Throat</label>
+                        <label><input type="checkbox" name="symptom" value="None" checked> None of the above</label>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Guardian's Signature</label>
+                    <p style="font-size: 0.8rem; margin-bottom: 0.5rem; color: #64748b;">Please sign inside the box
+                        below.</p>
+                    <canvas id="signaturePad" width="600" height="200"></canvas>
+                    <button type="button" onclick="clearSignature()"
+                        style="font-size: 0.8rem; color: #ef4444; border: none; background: none; cursor: pointer; text-decoration: underline;">Clear
+                        Signature</button>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="prevStep(3)">Back</button>
+                    <button class="btn btn-primary" onclick="submitFinal()">Submit Application <i
+                            class="fas fa-check"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 5: Success -->
+            <div class="form-section" id="step5">
+                <div class="success-content">
+                    <i class="fas fa-check-circle success-icon"></i>
+                    <h2>Congratulations!</h2>
+                    <p>Your early enrollment application has been submitted successfully.</p>
+
+                    <p style="margin-top: 2rem;">Your Unique Registration Code:</p>
+                    <div class="unique-code" id="displayCode">EE-XXXXXX</div>
+
+                    <div class="screenshot-hint">
+                        <i class="fas fa-camera"></i> PLEASE TAKE A SCREENSHOT OF THIS PAGE AS PROOF OF REGISTRATION
+                    </div>
+
+                    <p style="margin-top: 2rem; font-size: 0.9rem; color: #64748b;">
+                        Please check your email or wait for further announcements regarding the schedule of sectioning
+                        and validation.
+                    </p>
+
+                    <button class="btn btn-outline" style="margin-top: 2rem; border: 1px solid var(--primary);"
+                        onclick="window.location.reload()">Back to Home</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="js/early-registration.js"></script>
+</body>
+
+</html>

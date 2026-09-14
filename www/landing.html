@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doroteo S. Mendoza Sr. Memorial NHS</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* CSS RESET */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0f172a;
+            /* Deep Slate Blue */
+            --accent: #d97706;
+            /* Gold/Amber */
+            --white: #ffffff;
+            --light: #f8fafc;
+            /* Off-white background */
+            --text: #334155;
+            /* Dark Grey Text */
+            --overlay: rgba(15, 23, 42, 0.85);
+            /* Dark overlay */
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--light);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Playfair Display', serif;
+            line-height: 1.2;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        /* NAVIGATION */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.25rem;
+        }
+
+        .logo img {
+            height: 50px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .btn-cta {
+            background: var(--accent);
+            color: white !important;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: transform 0.2s, background 0.2s;
+            box-shadow: 0 4px 6px rgba(217, 119, 6, 0.3);
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            background: #b45309;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding-top: 80px;
+            /* Offset for fixed nav */
+            background-image: linear-gradient(var(--overlay), var(--overlay)), url('https://img.freepik.com/free-photo/front-view-young-students-holding-books_23-2148523282.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            /* Parallax Effect */
+        }
+
+        .hero-content {
+            max-width: 900px;
+            padding: 2rem;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+        }
+
+        /* ACHIEVEMENTS CAROUSEL */
+        .achievements-section {
+            padding: 4rem 5%;
+            background: white;
+            position: relative;
+            margin-top: -5rem;
+            /* Overlap effect */
+            z-index: 10;
+        }
+
+        .carousel-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            background: #000;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 1s ease-in-out;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            position: relative;
+        }
+
+        .slide-img {
+            width: 100%;
+            height: 500px;
+            object-fit: cover;
+            opacity: 0.6;
+        }
+
+        .slide-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 3rem;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+            color: white;
+        }
+
+        .slide-caption h3 {
+            font-size: 2.5rem;
+            color: #fbbf24;
+            margin-bottom: 0.5rem;
+        }
+
+        .slide-caption p {
+            font-size: 1.2rem;
+        }
+
+        /* UNIFORMS SECTION */
+        .section-std {
+            padding: 6rem 5%;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .tag {
+            color: var(--accent);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+        }
+
+        .section-header h2 {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-top: 0.5rem;
+        }
+
+        .uniform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .uniform-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .uniform-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .uniform-header {
+            height: 250px;
+            background-size: cover;
+            background-position: center top;
+            position: relative;
+        }
+
+        .uniform-badge {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            padding: 5px 20px;
+            border-radius: 50px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .uniform-body {
+            padding: 2rem;
+        }
+
+        .uniform-list li {
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+        }
+
+        .uniform-list i {
+            color: var(--accent);
+        }
+
+        /* HISTORY TIMELINE */
+        .timeline-container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            padding-left: 2rem;
+            border-left: 3px solid #cbd5e1;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 3rem;
+            padding-left: 2rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.6rem;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            border: 4px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px #cbd5e1;
+        }
+
+        .year-label {
+            font-weight: 800;
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        .timeline-title {
+            font-size: 1.5rem;
+            margin: 0.5rem 0;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* PRINCIPALS */
+        .principals-flex {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .principal-profile {
+            text-align: center;
+            width: 200px;
+        }
+
+        .principal-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--accent);
+            padding: 4px;
+            margin-bottom: 1rem;
+        }
+
+        /* ENROLLMENT FORM */
+        .enrollment-wrap {
+            background: var(--primary);
+            color: white;
+            padding: 6rem 5%;
+        }
+
+        .enroll-form-card {
+            background: white;
+            color: var(--text);
+            max-width: 800px;
+            margin: 0 auto;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        .grids {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1.25rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 2rem;
+            transition: background 0.3s;
+        }
+
+        .btn-submit:hover {
+            background: #b45309;
+        }
+
+        /* FOOTER */
+        footer {
+            background: #020617;
+            color: #94a3b8;
+            padding: 4rem 5%;
+            text-align: center;
+        }
+
+        /* RESPONSIVE */
+        /* MOBILE NAV */
+        .mobile-toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary);
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            background: white;
+            padding: 2rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-150%);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            text-align: center;
+            z-index: 999;
+        }
+
+        .mobile-menu.active {
+            transform: translateY(0);
+        }
+
+        .mobile-menu a {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* RESPONSIVE */
+        @media(max-width: 900px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .hero p {
+                padding: 0 1rem;
+            }
+
+            .slide-caption h3 {
+                font-size: 1.8rem;
+            }
+
+            .slide-caption p {
+                font-size: 1rem;
+            }
+
+            .grids,
+            .timeline-content,
+            .uniform-grid,
+            .news-grid,
+            .faculty-grid,
+            .gallery-grid,
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-std,
+            .achievements-section,
+            .enrollment-wrap {
+                padding: 4rem 1.5rem;
+            }
+
+            .carousel-container {
+                border-radius: 0;
+            }
+
+            .slide-img {
+                height: 350px;
+            }
+
+            .timeline-item {
+                padding-left: 1.5rem;
+            }
+
+            .timeline-item::before {
+                left: -2.1rem;
+            }
+
+            .timeline-container {
+                padding-left: 1.5rem;
+            }
+
+            .enroll-form-card {
+                padding: 1.5rem;
+            }
+        }
+
+        @media(max-width: 480px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            .slide-caption {
+                padding: 1.5rem;
+            }
+
+            .slide-caption h3 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav>
+        <div class="logo">
+            <img src="logo.png" alt="Logo">
+            <span>DSMSMNHS</span>
+        </div>
+
+        <!-- Desktop Nav -->
+        <div class="nav-links">
+            <a href="#about">About</a>
+            <a href="#news">News</a>
+            <a href="#faculty">Faculty</a>
+            <a href="#enrollment">Enrollment</a>
+            <a href="login.html" class="btn-cta">Login</a>
+        </div>
+
+        <!-- Mobile Toggle -->
+        <div class="mobile-toggle" onclick="toggleMobileMenu()">
+            <i class="fas fa-bars"></i>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <div class="hero" id="home">
+        <div class="hero-content">
+            <h1>Doroteo S. Mendoza Sr.<br>Memorial National High School</h1>
+            <p>Empowering Minds, Shaping Futures. Join our community of excellence.</p>
+            <a href="#enrollness" class="btn-cta">Enroll Now</a>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Container -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#achievements" onclick="toggleMobileMenu()">Achievements</a>
+        <a href="#news" onclick="toggleMobileMenu()">News</a>
+        <a href="#about" onclick="toggleMobileMenu()">History</a>
+        <a href="#faculty" onclick="toggleMobileMenu()">Faculty</a>
+        <a href="#gallery" onclick="toggleMobileMenu()">Gallery</a>
+        <a href="#uniforms" onclick="toggleMobileMenu()">Uniforms</a>
+        <a href="#services" onclick="toggleMobileMenu()">Services</a>
+        <a href="#enroll" class="btn-cta" onclick="toggleMobileMenu()">Enroll Now</a>
+    </div>
+
+    <!-- HERO -->
+
+    <!-- ACHIEVEMENTS CAROUSEL -->
+    <div class="achievements-section" id="achievements">
+        <div class="section-header">
+            <span class="tag">Excellence in Action</span>
+            <h2>Our Achievements</h2>
+        </div>
+
+        <div class="carousel-container">
+            <div class="carousel-track" id="track">
+                <!-- Slide 1 -->
+                <div class="carousel-slide">
+                    <img src="https://img.freepik.com/free-photo/winner-team-holding-trophy-celebrating-success_23-2148523351.jpg"
+                        class="slide-img">
+                    <div class="slide-caption">
+                        <h3>DSPC Overall Champion 2025</h3>
+                        <p>Consistent excellence in Campus Journalism across the Division.</p>
+                    </div>
+                </div>
+                <!-- Slide 2 -->
+                <div class="carousel-slide">
+                    <img src="https://img.freepik.com/free-photo/students-identifying-countries-globe_23-2148199742.jpg"
+                        class="slide-img">
+                    <div class="slide-caption">
+                        <h3>Math Olympiad Gold Medalists</h3>
+                        <p>Our students secured top spots in the Regional Mathematics Competition.</p>
+                    </div>
+                </div>
+                <!-- Slide 3 -->
+                <div class="carousel-slide">
+                    <img src="https://img.freepik.com/free-photo/group-diverse-people-having-business-meeting_53876-25060.jpg"
+                        class="slide-img">
+                    <div class="slide-caption">
+                        <h3>Best Brigada Eskwela Implementer</h3>
+                        <p>Recognized for outstanding community partnership and school readiness.</p>
+                    </div>
+                </div>
+                <!-- Slide 4 -->
+                <div class="carousel-slide">
+                    <img src="https://img.freepik.com/free-photo/happy-students-graduate-day_23-2148522648.jpg"
+                        class="slide-img">
+                    <div class="slide-caption">
+                        <h3>100% Graduation Rate</h3>
+                        <p>Ensuring every learner completes their basic education with quality.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ANNOUNCEMENTS & NEWS -->
+    <section class="section-std" id="news">
+        <div class="section-header">
+            <span class="tag">Stay Updated</span>
+            <h2>Latest Announcements</h2>
+        </div>
+        <div class="news-grid">
+            <div class="news-card">
+                <div class="news-img"
+                    style="background-image: url('https://img.freepik.com/free-photo/pencil-case-with-stationery-table_23-2148523351.jpg');">
+                </div>
+                <div class="news-content">
+                    <span class="news-date">JAN 15, 2026</span>
+                    <h3>Enrollment for SY 2025-2026</h3>
+                    <p>We are now accepting applications for new students and transferees. Apply online using the form
+                        below.</p>
+                </div>
+            </div>
+            <div class="news-card">
+                <div class="news-img"
+                    style="background-image: url('https://img.freepik.com/free-photo/group-asia-young-students-study-together-library_1150-16.jpg');">
+                </div>
+                <div class="news-content">
+                    <span class="news-date">DEC 10, 2025</span>
+                    <h3>Academic Achievers Awarded</h3>
+                    <p>Congratulations to our top students for the 2nd Quarter. Awarding ceremony will be held at the
+                        gym.</p>
+                </div>
+            </div>
+            <div class="news-card">
+                <div class="news-img"
+                    style="background-image: url('https://img.freepik.com/free-photo/young-volunteers-cleaning-park_23-2148523318.jpg');">
+                </div>
+                <div class="news-content">
+                    <span class="news-date">NOV 25, 2025</span>
+                    <h3>Brigada Eskwela Kickoff</h3>
+                    <p>Join us in preparing our facilities for the upcoming events. Parents and alumni are welcome.</p>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .news-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 2rem;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+
+            .news-card {
+                background: white;
+                border-radius: 15px;
+                overflow: hidden;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                transition: transform 0.3s;
+            }
+
+            .news-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .news-img {
+                height: 200px;
+                background-color: #cbd5e1;
+                background-size: cover;
+                background-position: center;
+            }
+
+            .news-content {
+                padding: 1.5rem;
+            }
+
+            .news-date {
+                font-size: 0.8rem;
+                color: var(--accent);
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+                display: block;
+            }
+
+            .news-content h3 {
+                font-size: 1.25rem;
+                margin-bottom: 0.5rem;
+                color: var(--primary);
+                font-family: 'Playfair Display', serif;
+            }
+
+            .news-content p {
+                color: #64748b;
+                line-height: 1.5;
+                font-size: 0.95rem;
+            }
+        </style>
+    </section>
+
+    <!-- HISTORY & PRINCIPALS -->
+    <section class="section-std" id="about" style="background: white;">
+        <div class="section-header">
+            <span class="tag">Our Heritage</span>
+            <h2>History & Leadership</h2>
+        </div>
+
+        <div class="timeline-container">
+            <div class="timeline-item">
+                <div class="year-label">1991</div>
+                <h3 class="timeline-title">Foundation</h3>
+                <p>Established to provide quality education to the youth of Mindoro.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="year-label">2005</div>
+                <h3 class="timeline-title">Campus Expansion</h3>
+                <p>New buildings were constructed to accommodate the growing student population.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="year-label">2021 - Present</div>
+                <h3 class="timeline-title">Modernization Era</h3>
+                <p>Under the leadership of Dr. Gardoce, the school embraced digital transformation.</p>
+            </div>
+        </div>
+
+        <div class="principals-flex">
+            <div class="principal-profile">
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="principal-img">
+                <h4>Mr. Founder</h4>
+                <p style="font-size: 0.9rem; color: #64748b;">1991 - 2000</p>
+            </div>
+            <div class="principal-profile">
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135768.png" class="principal-img">
+                <h4>Mrs. Successor</h4>
+                <p style="font-size: 0.9rem; color: #64748b;">2000 - 2021</p>
+            </div>
+            <div class="principal-profile">
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135823.png" class="principal-img"
+                    style="border-color: var(--primary);">
+                <h4>VICTOR D. GARDOCE, Ph.D.</h4>
+                <p style="font-size: 0.9rem; color: var(--accent); font-weight: 700;">Current Principal</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FACULTY -->
+    <section class="section-std" id="faculty" style="background: #f8fafc;">
+        <div class="section-header">
+            <span class="tag">Our Team</span>
+            <h2>Faculty & Administration</h2>
+        </div>
+        <div class="faculty-grid">
+            <div class="faculty-card">
+                <div class="faculty-avatar"
+                    style="background-image: url('https://img.freepik.com/free-photo/portrait-teacher-giving-class_23-2149028243.jpg');">
+                </div>
+                <h4>Ms. Sarah Johnson</h4>
+                <span class="faculty-role">Head Teacher (Science)</span>
+            </div>
+            <div class="faculty-card">
+                <div class="faculty-avatar"
+                    style="background-image: url('https://img.freepik.com/free-photo/portrait-smiling-male-teacher_23-2148197771.jpg');">
+                </div>
+                <h4>Mr. John Smith</h4>
+                <span class="faculty-role">Head Teacher (Math)</span>
+            </div>
+            <div class="faculty-card">
+                <div class="faculty-avatar"
+                    style="background-image: url('https://img.freepik.com/free-photo/young-teacher-standing-with-folder_23-2148227310.jpg');">
+                </div>
+                <h4>Mrs. Maria Cruz</h4>
+                <span class="faculty-role">Head Teacher (English)</span>
+            </div>
+            <div class="faculty-card">
+                <div class="faculty-avatar"
+                    style="background-image: url('https://img.freepik.com/free-photo/portrait-young-teacher-looking-camera_23-2148227299.jpg');">
+                </div>
+                <h4>Mr. Robert Doe</h4>
+                <span class="faculty-role">MAPEH Coordinator</span>
+            </div>
+        </div>
+        <style>
+            .faculty-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1.5rem;
+                max-width: 1000px;
+                margin: 0 auto;
+            }
+
+            .faculty-card {
+                background: white;
+                padding: 2rem;
+                border-radius: 12px;
+                text-align: center;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            }
+
+            .faculty-avatar {
+                width: 100px;
+                height: 100px;
+                background: #cbd5e1;
+                border-radius: 50%;
+                margin: 0 auto 1rem auto;
+                background-size: cover;
+                background-position: center;
+                border: 3px solid var(--accent);
+            }
+
+            .faculty-role {
+                font-size: 0.85rem;
+                color: var(--accent);
+                font-weight: 600;
+                text-transform: uppercase;
+                margin-top: 0.5rem;
+                display: block;
+            }
+        </style>
+    </section>
+
+    <!-- GALLERY GRID -->
+    <section class="section-std" id="gallery" style="background: #0f172a; color: white;">
+        <div class="section-header">
+            <span class="tag" style="color:white; opacity: 0.7;">Campus Life</span>
+            <h2 style="color:white;">Event Gallery</h2>
+        </div>
+
+        <div class="gallery-grid">
+            <div class="gallery-item">
+                <img src="https://img.freepik.com/free-photo/happy-students-graduate-day_23-2148522648.jpg" alt="Grad">
+                <div class="gallery-overlay">
+                    <div class="gallery-text">GRADUATION</div>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://img.freepik.com/free-photo/young-people-running-together_23-2148199723.jpg"
+                    alt="Sports">
+                <div class="gallery-overlay">
+                    <div class="gallery-text">SPORTS FEST</div>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://img.freepik.com/free-photo/students-knowing-right-answer_329181-14271.jpg"
+                    alt="Academics">
+                <div class="gallery-overlay">
+                    <div class="gallery-text">CLASSROOM</div>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://img.freepik.com/free-photo/group-diverse-people-having-business-meeting_53876-25060.jpg"
+                    alt="Community">
+                <div class="gallery-overlay">
+                    <div class="gallery-text">COMMUNITY</div>
+                </div>
+            </div>
+        </div>
+        <style>
+            .gallery-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1rem;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+
+            .gallery-item {
+                position: relative;
+                height: 250px;
+                overflow: hidden;
+                border-radius: 12px;
+                cursor: pointer;
+            }
+
+            .gallery-item img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.5s;
+            }
+
+            .gallery-item:hover img {
+                transform: scale(1.1);
+            }
+
+            .gallery-overlay {
+                position: absolute;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.4);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .gallery-item:hover .gallery-overlay {
+                opacity: 1;
+            }
+
+            .gallery-text {
+                color: white;
+                font-weight: 700;
+                letter-spacing: 1px;
+                border: 1px solid white;
+                padding: 10px 20px;
+            }
+        </style>
+    </section>
+
+    <!-- UNIFORMS -->
+    <section class="section-std" id="uniforms" style="background: #f1f5f9;">
+        <div class="section-header">
+            <span class="tag">School Identity</span>
+            <h2>Prescribed Uniforms</h2>
+        </div>
+
+        <div class="uniform-grid">
+            <!-- Male -->
+            <div class="uniform-card">
+                <div class="uniform-header"
+                    style="background-image: url('https://img.freepik.com/free-photo/portrait-asian-boy-student-wearing-school-uniform_23-2148197793.jpg');">
+                    <div class="uniform-badge">MALE</div>
+                </div>
+                <div class="uniform-body">
+                    <ul class="uniform-list">
+                        <li><i class="fas fa-check-circle"></i> White Polo Shirt with Patch</li>
+                        <li><i class="fas fa-check-circle"></i> Plain Black Slacks</li>
+                        <li><i class="fas fa-check-circle"></i> Black Leather Shoes</li>
+                        <li><i class="fas fa-check-circle"></i> White Socks</li>
+                        <li><i class="fas fa-check-circle"></i> Clean Haircut (2x3)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Female -->
+            <div class="uniform-card">
+                <div class="uniform-header"
+                    style="background-image: url('https://img.freepik.com/free-photo/young-student-woman-with-backpack-books_23-2148523276.jpg');">
+                    <div class="uniform-badge">FEMALE</div>
+                </div>
+                <div class="uniform-body">
+                    <ul class="uniform-list">
+                        <li><i class="fas fa-check-circle"></i> White Blouse with Necktie</li>
+                        <li><i class="fas fa-check-circle"></i> Checkered Skirt (Knee length)</li>
+                        <li><i class="fas fa-check-circle"></i> Black Leather Shoes</li>
+                        <li><i class="fas fa-check-circle"></i> White Socks</li>
+                        <li><i class="fas fa-check-circle"></i> Hair neatly tied</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES / DOCUMENTS -->
+    <section class="section-std" id="services" style="background: white;">
+        <div class="section-header">
+            <span class="tag">Student Support</span>
+            <h2>Document Requests</h2>
+            <p>Need school records? Here is how to request your documents.</p>
+        </div>
+
+        <div class="services-grid">
+            <div class="service-card">
+                <i class="fas fa-file-alt service-icon"></i>
+                <h3>Form 137 / SF10</h3>
+                <p>Permanent Record. Request at the Registrar's Office. Processing time: 3-5 days.</p>
+            </div>
+            <div class="service-card">
+                <i class="fas fa-certificate service-icon"></i>
+                <h3>Certificate of Enrollment</h3>
+                <p>Proof of current enrollment. Available at the Guidance Office. Processing time: 1 day.</p>
+            </div>
+            <div class="service-card">
+                <i class="fas fa-graduation-cap service-icon"></i>
+                <h3>Diploma / Good Moral</h3>
+                <p>For graduates and transferees. Request at the Principal's Office. Processing time: 2-3 days.</p>
+            </div>
+        </div>
+
+        <style>
+            .services-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 2rem;
+                max-width: 1000px;
+                margin: 0 auto;
+            }
+
+            .service-card {
+                padding: 2rem;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                text-align: center;
+                transition: all 0.3s;
+            }
+
+            .service-card:hover {
+                border-color: var(--accent);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            }
+
+            .service-icon {
+                font-size: 2.5rem;
+                color: var(--accent);
+                margin-bottom: 1rem;
+            }
+
+            .service-card h3 {
+                font-size: 1.25rem;
+                color: var(--primary);
+                margin-bottom: 0.5rem;
+            }
+
+            .service-card p {
+                color: #64748b;
+                font-size: 0.95rem;
+            }
+        </style>
+    </section>
+
+    <!-- ENROLLMENT -->
+    <section class="enrollment-wrap" id="enroll">
+        <div class="section-header" style="color: white; margin-bottom: 3rem;">
+            <h2 style="color: white;">Join Our Family</h2>
+            <p style="opacity: 0.8;">Online Enrollment for New Students & Transferees</p>
+        </div>
+
+        <div class="enroll-form-card" style="text-align: center; padding: 4rem 2rem;">
+            <i class="fas fa-graduation-cap" style="font-size: 4rem; color: var(--accent); margin-bottom: 2rem;"></i>
+            <h3 style="color: var(--primary); margin-bottom: 1rem; font-size: 2rem;">Online Enrollment is Open!</h3>
+            <p style="color: #64748b; margin-bottom: 3rem; font-size: 1.1rem;">
+                Experience our fast and easy multi-step digital enrollment process. Click the button below to start your application.
+            </p>
+            <a href="regular-enrollment.html" class="btn-submit" style="display: inline-block; text-decoration: none; max-width: 300px; padding: 1.2rem; font-size: 1.1rem; border-radius: 50px;">
+                PROCEED TO ENROLLMENT
+            </a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 Doroteo S. Mendoza Sr. Memorial NHS. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // MOBILE MENU TOGGLE
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('active');
+        }
+
+        // SLOW CAROUSEL LOGIC
+        const track = document.getElementById('track');
+        let index = 0;
+        const totalSlides = 4; // Total slides present
+
+        function nextSlide() {
+            index = (index + 1) % totalSlides;
+            track.style.transform = `translateX(-${index * 100}%)`;
+        }
+
+        // 6000ms = 6 seconds for slow reading time
+        setInterval(nextSlide, 6000);
+
+        // ENROLLMENT SUBMISSION
+        const API_BASE = 'http://localhost:3007/api';
+        document.getElementById('enrollmentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = 'Submitting...';
+            btn.disabled = true;
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch(`${API_BASE}/public/enroll`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    alert('Application Submitted Successfully!');
+                    e.target.reset();
+                } else {
+                    alert('Error: ' + (result.error || 'Failed'));
+                }
+            } catch (err) {
+                alert('Network Error');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

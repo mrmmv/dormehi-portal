@@ -1,0 +1,238 @@
+/* SSLG Election Voting Layout */
+
+.election-container {
+    padding-bottom: 50px;
+}
+
+/* Header */
+.election-header {
+    padding: 30px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, var(--glass) 0%, rgba(15, 23, 42, 0.9) 100%);
+}
+
+.election-info h2 {
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+    background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.election-meta {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+    align-items: center;
+}
+
+/* Position Box */
+.position-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+}
+
+.position-card:hover {
+    border-color: var(--primary-light);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.position-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.position-header h3 {
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.position-header h3 i {
+    color: var(--warning);
+    filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.4));
+}
+
+.vote-limit-badge {
+    background: rgba(124, 58, 237, 0.15);
+    color: var(--primary-light);
+    padding: 6px 15px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid rgba(124, 58, 237, 0.3);
+}
+
+/* Candidates Horizontal Layout */
+.candidates-grid {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding: 10px 5px 25px 5px;
+    /* Bottom padding for shadow/scroll */
+    scroll-behavior: smooth;
+    /* Custom Scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) var(--bg-secondary);
+}
+
+.candidates-grid::-webkit-scrollbar {
+    height: 8px;
+}
+
+.candidates-grid::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 4px;
+}
+
+.candidates-grid::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 4px;
+}
+
+/* Candidate Card */
+.candidate-option {
+    flex: 0 0 220px;
+    /* Fixed width, no shrink */
+    background: var(--bg-secondary);
+    border: 2px solid var(--glass-border);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.candidate-option:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-light);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Selection State */
+.candidate-option.selected {
+    border-color: var(--success);
+    background: rgba(16, 185, 129, 0.05);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+}
+
+.candidate-check {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--bg-color);
+    border: 2px solid var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: transparent;
+    transition: all 0.2s;
+    z-index: 2;
+}
+
+.candidate-option.selected .candidate-check {
+    background: var(--success);
+    border-color: var(--success);
+    color: white;
+    transform: scale(1.1);
+}
+
+/* Candidate Photo */
+.candidate-photo {
+    width: 100%;
+    height: 220px;
+    /* Square-ish aspect */
+    background: #1e293b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.candidate-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.candidate-option:hover .candidate-photo img {
+    transform: scale(1.05);
+}
+
+.candidate-photo i {
+    font-size: 4rem;
+    color: var(--text-secondary);
+    opacity: 0.5;
+}
+
+/* Info */
+.candidate-info {
+    padding: 15px;
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.candidate-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    color: var(--text-primary);
+    line-height: 1.3;
+}
+
+.candidate-partylist {
+    font-size: 0.85rem;
+    color: var(--primary-light);
+    font-weight: 500;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.candidate-motto {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-top: auto;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .candidate-option {
+        flex: 0 0 180px;
+        /* Smaller on mobile */
+    }
+
+    .candidate-photo {
+        height: 180px;
+    }
+}
